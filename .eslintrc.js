@@ -21,6 +21,8 @@ module.exports = {
   ],
   rules: {
     semi: [2, 'never'],
+    'no-shadow': 'off',
+    'no-param-reassign': 'off',
     'react/require-default-props': 'off',
     'react/prop-types': 'off',
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
