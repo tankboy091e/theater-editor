@@ -1,26 +1,35 @@
 import Cell from 'lib/entity/cell'
-import SelectedCell from 'lib/entity/selected-cell'
 import { Vector2 } from 'lib/util/mathf'
-import getPosition from 'lib/util/mouseEvent'
-import { useEffect, useRef } from 'react'
+import {
+  MutableRefObject, useEffect, useRef, useState,
+} from 'react'
 import styles from 'sass/templates/editor.module.scss'
+import { cn } from 'lib/util'
+import Tool from 'components/tool'
+import SelectTool from 'components/tool/select'
+import AssignTool from 'components/tool/assign'
+import EraseTool from 'components/tool/erase'
+import IndexerTool from 'components/tool/indexer'
+import useResize from 'lib/hooks'
 
 interface CanvasData {
+  ref: MutableRefObject<HTMLCanvasElement>
   context: CanvasRenderingContext2D
   width: number
   height: number
 }
 
-interface GridData extends CanvasData {
+export interface GridData extends CanvasData {
   cells: CellData[][]
   column: number
   row: number
   size: number
   gap: number
+  temporarySelectedCells: { [key: string]: CellData }
 }
 
-interface UiData extends CanvasData {
-  origin : Vector2
+export interface UiData extends CanvasData {
+  origin: Vector2
 }
 
 interface CellData {
@@ -28,13 +37,8 @@ interface CellData {
 }
 
 export default function Editor() {
-  const containerRef = useRef<HTMLElement>()
-  const toolBarRef = useRef<HTMLElement>()
-  const mainRef = useRef<HTMLElement>()
-  const gridRef = useRef<HTMLCanvasElement>()
-  const uiRef = useRef<HTMLCanvasElement>()
-
-  const gridData : GridData = {
+  const gridData = {
+    ref: null,
     context: null,
     width: 0,
     height: 0,
@@ -43,39 +47,28 @@ export default function Editor() {
     size: 18,
     gap: 6,
     cells: null,
+    temporarySelectedCells: {},
   }
-
-  const uiData : UiData = {
+  const uiData = {
+    ref: null,
     context: null,
     width: 0,
     height: 0,
     origin: { x: 0, y: 0 },
   }
 
-  const update = () => {
-    clear()
-    gridData.cells.forEach((array) => (
-      array.forEach((element) => {
-        element.target.draw(gridData.context, gridData.size)
-      })
-    ))
-  }
+  const [tools, setTools] = useState([])
+  const [tool, setTool] = useState<Tool>(null)
 
-  const clear = () => {
-    gridData.context.clearRect(0, 0, gridData.width, gridData.height)
-  }
+  const toolRef = useRef<Tool>(tool)
+  const containerRef = useRef<HTMLElement>()
+  const toolBarRef = useRef<HTMLElement>()
+  const mainRef = useRef<HTMLElement>()
+  const gridRef = useRef<HTMLCanvasElement>()
+  const uiRef = useRef<HTMLCanvasElement>()
 
-  const select = (from : Vector2, to: Vector2) => {
-    const { size, gap } = gridData
-
-    for (let i = Math.floor(from.y / (size + gap)); i < Math.round(to.y / (size + gap)); i++) {
-      for (let j = Math.floor(from.x / (size + gap)); j < Math.round(to.x / (size + gap)); j++) {
-        const { x, y } = gridData.cells[i][j].target.position
-        gridData.cells[i][j].target = new SelectedCell(x, y)
-      }
-    }
-
-    update()
+  const onToolClick = (tool: Tool) => {
+    setTool(tool)
   }
 
   const setCenter = () => {
@@ -85,103 +78,79 @@ export default function Editor() {
     )
   }
 
-  const calibrateMousePosition = (position : Vector2) => {
-    const result = position
-    result.x -= mainRef.current.offsetLeft - mainRef.current.scrollLeft
-    result.y -= mainRef.current.offsetTop - mainRef.current.scrollTop
-    return result
-  }
-
-  const onDragStart = (e: MouseEvent): void => {
-    attachListeners()
-
-    uiData.origin = calibrateMousePosition(getPosition(e))
-  }
-
-  const onDrag = (e: MouseEvent): void => {
-    const position = calibrateMousePosition(getPosition(e))
-
-    const {
-      origin, context, width, height,
-    } = uiData
-
-    context.clearRect(0, 0, width, height)
-    context.strokeStyle = 'rgba(0, 100, 250, .7)'
-    context.strokeRect(origin.x, origin.y, position.x - origin.x, position.y - origin.y)
-    context.fillStyle = 'rgba(0, 100, 250, .3)'
-    context.fillRect(origin.x, origin.y, position.x - origin.x, position.y - origin.y)
-  }
-
-  const onDragEnd = (e: MouseEvent): void => {
-    detachListeners()
-
-    const position = calibrateMousePosition(getPosition(e))
-    const {
-      origin, context, width, height,
-    } = uiData
-
-    context.clearRect(0, 0, width, height)
-
-    select({
-      x: origin.x < position.x ? origin.x : position.x,
-      y: origin.y < position.y ? origin.y : position.y,
-    },
-    {
-      x: origin.x > position.x ? origin.x : position.x,
-      y: origin.y > position.y ? origin.y : position.y,
-    })
-  }
-
-  const initializeCanvas = (ref: HTMLCanvasElement, data: CanvasData) => {
-    data.context = ref.getContext('2d')
-    ref.width = gridData.column * (gridData.size + gridData.gap) + gridData.gap
-    ref.height = gridData.row * (gridData.size + gridData.gap) + gridData.gap
+  const initializeCanvas = (ref: MutableRefObject<HTMLCanvasElement>, data: CanvasData) => {
+    data.context = ref.current.getContext('2d')
+    ref.current.width = gridData.column * (gridData.size + gridData.gap) + gridData.gap
+    ref.current.height = gridData.row * (gridData.size + gridData.gap) + gridData.gap
     data.width = gridRef.current.width
     data.height = gridRef.current.height
-  }
-
-  const initializeEventListener = () => {
-    uiRef.current.addEventListener('mousedown', onDragStart)
+    data.ref = ref
+    ref.current.addEventListener('contextmenu', (e) => e.preventDefault())
   }
 
   const initializeCells = () => {
     const { width, height } = gridData
-    const { size: gridSize, gap } = gridData
+    const { size, gap } = gridData
 
     gridData.cells = []
-    for (let i = gap; i < height; i += gridSize + gap) {
+    for (let i = gap; i < height; i += size + gap) {
       const row = []
-      for (let j = gap; j < width; j += gridSize + gap) {
+      for (let j = gap; j < width; j += size + gap) {
         row.push({
-          target: new Cell(j, i, 'rgba(0, 0, 0, .3)'),
+          target: new Cell(j, i),
         })
       }
       gridData.cells.push(row)
     }
   }
 
-  const attachListeners = () => {
-    uiRef.current.addEventListener('mouseup', onDragEnd)
-    uiRef.current.addEventListener('mousemove', onDrag)
+  const initializeTools = () => {
+    const editorData = {
+      gridData,
+      uiData,
+      containerRef: mainRef,
+    }
+    const initialTool = new SelectTool(editorData)
+    setTools([
+      initialTool,
+      new AssignTool(editorData),
+      new EraseTool(editorData),
+      new IndexerTool(editorData),
+    ])
+    setTool(initialTool)
   }
 
-  const detachListeners = () => {
-    uiRef.current.removeEventListener('mouseup', onDragEnd)
-    uiRef.current.removeEventListener('mousemove', onDrag)
-  }
+  useResize(setCenter)
 
   useEffect(() => {
-    initializeCanvas(gridRef.current, gridData)
-    initializeCanvas(uiRef.current, uiData)
-    initializeEventListener()
+    toolRef.current = tool
+  }, [tool])
+
+  useEffect(() => {
+    initializeCanvas(gridRef, gridData)
+    initializeCanvas(uiRef, uiData)
     initializeCells()
-    update()
+    initializeTools()
     setCenter()
   }, [])
 
   return (
     <section ref={containerRef} className={styles.container}>
-      <section ref={toolBarRef} className={styles.toolBar} />
+      <section ref={toolBarRef} className={styles.toolBar}>
+        {tools.map((element) => {
+          const { name, icon } = element
+          return (
+            <button
+              key={name}
+              type="button"
+              className={cn(styles.tool, tool?.name === name && styles.active)}
+              onClick={() => onToolClick(element)}
+            >
+              {icon}
+            </button>
+          )
+        })}
+      </section>
       <section ref={mainRef} className={styles.main}>
         <canvas ref={gridRef} className={styles.canvas} />
         <canvas ref={uiRef} className={styles.ui} />

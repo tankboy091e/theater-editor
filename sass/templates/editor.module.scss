@@ -1,3 +1,8 @@
+@use '../lib/colors.scss' as colors;
+@use '../lib/util.scss' as util;
+
+$padding: 4px;
+
 .container {
     height: 100vh;
     display: flex;
@@ -6,7 +11,30 @@
 
 .toolBar {
     width: 100%;
-    padding: .5rem;
+    padding: $padding;
+    display: flex;
+    border-bottom: 1px solid rgba(black, .3);
+}
+
+.tool {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover:not(.active) {
+        background-color: rgba(colors.$accent, .08);
+    }
+
+    &.active {
+        cursor: default;
+        color: colors.$accent;
+    }
+
+    & + & {
+        margin-left: $padding;
+    }
 }
 
 .main {
@@ -15,6 +43,8 @@
     flex: 1;
     overflow-x: scroll;
     overflow-y: scroll;
+
+    @include util.scroll-bar();
 }
 
 .ui {

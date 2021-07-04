@@ -4,7 +4,7 @@ export default class Cell {
   public readonly position: Vector2
   private readonly color: string
 
-  constructor(x: number, y: number, color: string) {
+  constructor(x: number, y: number, color: string = 'rgba(0, 0, 0, .2)') {
     this.position = {
       x,
       y,
