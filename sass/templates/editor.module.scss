@@ -1,0 +1,24 @@
+.container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.toolBar {
+    width: 100%;
+    padding: .5rem;
+}
+
+.main {
+    position: relative;
+    width: 100vw;
+    flex: 1;
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+
+.ui {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
