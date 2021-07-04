@@ -9,7 +9,6 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
   constructor(name: ToolType, data: EditorData) {
     super(name, data)
     this.bindDragListeners()
-    this.attachEventListeners()
   }
 
   private bindDragListeners() {
@@ -18,11 +17,6 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     this.onDragEnd = this.onDragEnd.bind(this)
     this.onDragCancle = this.onDragCancle.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
-  }
-
-  private attachEventListeners() {
-    this.uiData.ref.current.addEventListener('mousedown', this.onDragStart)
-    window.addEventListener('keydown', this.onKeyDown)
   }
 
   public onDragStart(e: MouseEvent): void {
@@ -53,16 +47,18 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
   }
 
   public onDragEnd(): void {
-    this.clear()
+    this.detachListeners()
+    this.clearUI()
   }
 
   public onDragCancle(): void {
-    this.clear()
+    this.onDragEnd()
   }
 
-  protected clear(): void {
-    this.detachListeners()
-    this.clearUI()
+  public onKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      this.onDragCancle()
+    }
   }
 
   private calibrateMousePosition = (position: Vector2) => {
@@ -84,11 +80,5 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
 
   protected getPosition(e: MouseEvent) {
     return this.calibrateMousePosition(getPosition(e))
-  }
-
-  protected onKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Escape') {
-      this.onDragCancle()
-    }
   }
 }

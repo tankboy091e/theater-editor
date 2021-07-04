@@ -5,10 +5,7 @@ export default class Cell {
   private readonly color: string
 
   constructor(x: number, y: number, color: string = 'rgba(0, 0, 0, .2)') {
-    this.position = {
-      x,
-      y,
-    }
+    this.position = { x, y }
     this.color = color
   }
 

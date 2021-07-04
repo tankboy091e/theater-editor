@@ -11,6 +11,7 @@ import AssignTool from 'components/tool/assign'
 import EraseTool from 'components/tool/erase'
 import IndexerTool from 'components/tool/indexer'
 import useResize from 'lib/hooks'
+import DraggableTool from 'components/tool/draggable'
 
 interface CanvasData {
   ref: MutableRefObject<HTMLCanvasElement>
@@ -25,7 +26,8 @@ export interface GridData extends CanvasData {
   row: number
   size: number
   gap: number
-  temporarySelectedCells: { [key: string]: CellData }
+  temporaryAssignedCells: { [key: string]: CellData }
+  assignedCells: { [key: string]: CellData }
 }
 
 export interface UiData extends CanvasData {
@@ -46,8 +48,9 @@ export default function Editor() {
     row: 100,
     size: 18,
     gap: 6,
-    cells: null,
-    temporarySelectedCells: {},
+    cells: [],
+    temporaryAssignedCells: {},
+    assignedCells: {},
   }
   const uiData = {
     ref: null,
@@ -57,9 +60,10 @@ export default function Editor() {
     origin: { x: 0, y: 0 },
   }
 
-  const [tools, setTools] = useState([])
+  const [tools, setTools] = useState<{ [key: string] : Tool }>({})
   const [tool, setTool] = useState<Tool>(null)
 
+  const toolsRef = useRef<{ [key: string] : Tool }>(tools)
   const toolRef = useRef<Tool>(tool)
   const containerRef = useRef<HTMLElement>()
   const toolBarRef = useRef<HTMLElement>()
@@ -69,6 +73,34 @@ export default function Editor() {
 
   const onToolClick = (tool: Tool) => {
     setTool(tool)
+  }
+
+  const onDragStart = (e: MouseEvent) => {
+    if (toolRef.current instanceof DraggableTool) {
+      toolRef.current.onDragStart(e)
+    }
+  }
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    switch (e.key.toLowerCase()) {
+      case 'v':
+        setTool(toolsRef.current.select)
+        return
+      case 'a':
+        setTool(toolsRef.current.assign)
+        return
+      case 'e':
+        setTool(toolsRef.current.erase)
+        return
+      case 'i':
+        setTool(toolsRef.current.indexer)
+        return
+      default:
+        break
+    }
+    if (toolRef.current instanceof DraggableTool) {
+      toolRef.current.onKeyDown(e)
+    }
   }
 
   const setCenter = () => {
@@ -92,7 +124,6 @@ export default function Editor() {
     const { width, height } = gridData
     const { size, gap } = gridData
 
-    gridData.cells = []
     for (let i = gap; i < height; i += size + gap) {
       const row = []
       for (let j = gap; j < width; j += size + gap) {
@@ -111,13 +142,18 @@ export default function Editor() {
       containerRef: mainRef,
     }
     const initialTool = new SelectTool(editorData)
-    setTools([
-      initialTool,
-      new AssignTool(editorData),
-      new EraseTool(editorData),
-      new IndexerTool(editorData),
-    ])
+    setTools({
+      select: initialTool,
+      assign: new AssignTool(editorData),
+      erase: new EraseTool(editorData),
+      indexer: new IndexerTool(editorData),
+    })
     setTool(initialTool)
+  }
+
+  const initializeControl = () => {
+    uiRef.current.addEventListener('mousedown', onDragStart)
+    window.addEventListener('keydown', onKeyDown)
   }
 
   useResize(setCenter)
@@ -127,17 +163,23 @@ export default function Editor() {
   }, [tool])
 
   useEffect(() => {
+    toolsRef.current = tools
+  }, [tools])
+
+  useEffect(() => {
     initializeCanvas(gridRef, gridData)
     initializeCanvas(uiRef, uiData)
     initializeCells()
     initializeTools()
     setCenter()
+    initializeControl()
   }, [])
 
   return (
     <section ref={containerRef} className={styles.container}>
+      {tools && (
       <section ref={toolBarRef} className={styles.toolBar}>
-        {tools.map((element) => {
+        {Object.values(tools).map((element) => {
           const { name, icon } = element
           return (
             <button
@@ -151,6 +193,7 @@ export default function Editor() {
           )
         })}
       </section>
+      )}
       <section ref={mainRef} className={styles.main}>
         <canvas ref={gridRef} className={styles.canvas} />
         <canvas ref={uiRef} className={styles.ui} />
