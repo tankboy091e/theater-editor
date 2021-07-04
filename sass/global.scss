@@ -1,0 +1,90 @@
+@use './lib/variables.scss' as variables;
+@use './lib/colors.scss' as colors;
+@import './lib/fonts.scss';
+
+* {
+  margin : 0;
+  padding : 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+}
+
+body {
+  position: relative;
+  color: colors.$primary;
+  background-color: colors.$background;
+}
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+fieldset {
+  border: 0;
+}
+
+button {
+  border: 0;
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  cursor: pointer;
+  &:focus {
+    outline: none;
+  }
+}
+
+address {
+  font-style: normal;
+}
+
+strong,
+b {
+  color: inherit;
+  font-size: inherit;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+input, textarea {
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
+  background-color: transparent;
+  border: none;
+  &:focus {
+    outline: none;
+  }
+}
+
+input[type=submit] {
+  cursor: pointer;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

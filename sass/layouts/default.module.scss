@@ -1,0 +1,29 @@
+.appContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.header,
+.main,
+.footer {
+    display: flex;
+    width: 100%;
+    padding: 0 24px;
+}
+
+.header,
+.main {
+    flex-direction: column;
+}
+
+.main {
+    flex: 1;
+}
+
+.bottom {
+    display: flex;
+}

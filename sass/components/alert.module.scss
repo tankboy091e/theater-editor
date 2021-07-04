@@ -1,0 +1,22 @@
+@use '../lib/colors.scss' as colors;
+
+.container {
+    background-color: colors.$background;
+    width: 230px;
+    padding: 24px;
+    border-radius: 7px;
+}
+
+.title {
+    color: colors.$accent;
+    font-size: 14px;
+}
+
+.text {
+    margin-top: 12px;
+    font-size: 12px;
+}
+
+.menu {
+    margin-top: 12px;
+}
