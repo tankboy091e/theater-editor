@@ -21,6 +21,7 @@ module.exports = {
   ],
   rules: {
     semi: [2, 'never'],
+    'no-restricted-syntax': 'off',
     'no-shadow': 'off',
     'no-param-reassign': 'off',
     'react/require-default-props': 'off',
@@ -54,6 +55,7 @@ module.exports = {
     ],
   },
   globals: {
+    EventListener: true,
     JSX: true,
     RequestInfo: true,
     RequestInit: true,
