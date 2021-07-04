@@ -1,22 +1,22 @@
-import { MutableRefObject, ReactNode } from 'react'
-import { GridData, UiData } from 'templates/editor'
+import { MutableRefObject } from 'react'
+import Grid from 'lib/entity/grid'
+import Ui from 'lib/entity/ui'
 
 export type ToolType = 'select' | 'assign' | 'erase' | 'indexer'
 
-export interface EditorData {
-  gridData: GridData
-  uiData: UiData
+export interface ToolData {
+  gridData: Grid
+  uiData: Ui
   containerRef: MutableRefObject<HTMLElement>
 }
 
 export default abstract class Tool {
   public name: ToolType
-  public icon: ReactNode
-  protected gridData: GridData
-  protected uiData: UiData
+  protected gridData: Grid
+  protected uiData: Ui
   protected containerRef: MutableRefObject<HTMLElement>
 
-  constructor(name: ToolType, data: EditorData) {
+  constructor(name: ToolType, data: ToolData) {
     this.name = name
     this.gridData = data.gridData
     this.uiData = data.uiData

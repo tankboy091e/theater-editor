@@ -1,69 +1,30 @@
-import Cell from 'lib/entity/cell'
-import { Vector2 } from 'lib/util/mathf'
 import {
-  MutableRefObject, useEffect, useRef, useState,
+  useEffect, useRef, useState, ReactNode,
 } from 'react'
 import styles from 'sass/templates/editor.module.scss'
 import { cn } from 'lib/util'
-import Tool from 'components/tool'
-import SelectTool from 'components/tool/select'
-import AssignTool from 'components/tool/assign'
-import EraseTool from 'components/tool/erase'
-import IndexerTool from 'components/tool/indexer'
+import Tool, { ToolData, ToolType } from 'services/tool'
+import SelectTool from 'services/tool/select'
+import AssignTool from 'services/tool/assign'
+import EraseTool from 'services/tool/erase'
+import IndexerTool from 'services/tool/indexer'
 import useResize from 'lib/hooks'
-import DraggableTool from 'components/tool/draggable'
-
-interface CanvasData {
-  ref: MutableRefObject<HTMLCanvasElement>
-  context: CanvasRenderingContext2D
-  width: number
-  height: number
-}
-
-export interface GridData extends CanvasData {
-  cells: CellData[][]
-  column: number
-  row: number
-  size: number
-  gap: number
-  temporaryAssignedCells: { [key: string]: CellData }
-  assignedCells: { [key: string]: CellData }
-}
-
-export interface UiData extends CanvasData {
-  origin: Vector2
-}
-
-interface CellData {
-  target: Cell
-}
+import DraggableTool from 'services/tool/draggable'
+import { RiEraserLine, RiCursorLine } from 'react-icons/ri'
+import { BiSelection } from 'react-icons/bi'
+import { ImSortNumericAsc } from 'react-icons/im'
+import Grid from 'lib/entity/grid'
+import Ui from 'lib/entity/ui'
 
 export default function Editor() {
-  const gridData = {
-    ref: null,
-    context: null,
-    width: 0,
-    height: 0,
-    column: 100,
-    row: 100,
-    size: 18,
-    gap: 6,
-    cells: [],
-    temporaryAssignedCells: {},
-    assignedCells: {},
-  }
-  const uiData = {
-    ref: null,
-    context: null,
-    width: 0,
-    height: 0,
-    origin: { x: 0, y: 0 },
-  }
+  const editorDataRef = useRef<ToolData>({
+    gridData: null,
+    uiData: null,
+    containerRef: null,
+  })
 
-  const [tools, setTools] = useState<{ [key: string] : Tool }>({})
   const [tool, setTool] = useState<Tool>(null)
 
-  const toolsRef = useRef<{ [key: string] : Tool }>(tools)
   const toolRef = useRef<Tool>(tool)
   const containerRef = useRef<HTMLElement>()
   const toolBarRef = useRef<HTMLElement>()
@@ -71,8 +32,24 @@ export default function Editor() {
   const gridRef = useRef<HTMLCanvasElement>()
   const uiRef = useRef<HTMLCanvasElement>()
 
-  const onToolClick = (tool: Tool) => {
-    setTool(tool)
+  const changeTool = (name: ToolType) => {
+    const editorData = editorDataRef.current
+    switch (name) {
+      case 'select':
+        setTool(new SelectTool(editorData))
+        break
+      case 'assign':
+        setTool(new AssignTool(editorData))
+        break
+      case 'erase':
+        setTool(new EraseTool(editorData))
+        break
+      case 'indexer':
+        setTool(new IndexerTool(editorData))
+        break
+      default:
+        break
+    }
   }
 
   const onDragStart = (e: MouseEvent) => {
@@ -84,16 +61,16 @@ export default function Editor() {
   const onKeyDown = (e: KeyboardEvent) => {
     switch (e.key.toLowerCase()) {
       case 'v':
-        setTool(toolsRef.current.select)
+        changeTool('select')
         return
       case 'a':
-        setTool(toolsRef.current.assign)
+        changeTool('assign')
         return
       case 'e':
-        setTool(toolsRef.current.erase)
+        changeTool('erase')
         return
       case 'i':
-        setTool(toolsRef.current.indexer)
+        changeTool('indexer')
         return
       default:
         break
@@ -110,45 +87,12 @@ export default function Editor() {
     )
   }
 
-  const initializeCanvas = (ref: MutableRefObject<HTMLCanvasElement>, data: CanvasData) => {
-    data.context = ref.current.getContext('2d')
-    ref.current.width = gridData.column * (gridData.size + gridData.gap) + gridData.gap
-    ref.current.height = gridData.row * (gridData.size + gridData.gap) + gridData.gap
-    data.width = gridRef.current.width
-    data.height = gridRef.current.height
-    data.ref = ref
-    ref.current.addEventListener('contextmenu', (e) => e.preventDefault())
-  }
-
-  const initializeCells = () => {
-    const { width, height } = gridData
-    const { size, gap } = gridData
-
-    for (let i = gap; i < height; i += size + gap) {
-      const row = []
-      for (let j = gap; j < width; j += size + gap) {
-        row.push({
-          target: new Cell(j, i),
-        })
-      }
-      gridData.cells.push(row)
-    }
-  }
-
-  const initializeTools = () => {
-    const editorData = {
-      gridData,
-      uiData,
-      containerRef: mainRef,
-    }
-    const initialTool = new SelectTool(editorData)
-    setTools({
-      select: initialTool,
-      assign: new AssignTool(editorData),
-      erase: new EraseTool(editorData),
-      indexer: new IndexerTool(editorData),
+  const initialize = () => {
+    editorDataRef.current.gridData = new Grid(gridRef, {
+      size: 18, gap: 6, column: 100, row: 100,
     })
-    setTool(initialTool)
+    editorDataRef.current.uiData = new Ui(uiRef, editorDataRef.current.gridData)
+    editorDataRef.current.containerRef = mainRef
   }
 
   const initializeControl = () => {
@@ -163,14 +107,8 @@ export default function Editor() {
   }, [tool])
 
   useEffect(() => {
-    toolsRef.current = tools
-  }, [tools])
-
-  useEffect(() => {
-    initializeCanvas(gridRef, gridData)
-    initializeCanvas(uiRef, uiData)
-    initializeCells()
-    initializeTools()
+    initialize()
+    changeTool('select')
     setCenter()
     initializeControl()
   }, [])
@@ -178,21 +116,18 @@ export default function Editor() {
   return (
     <section ref={containerRef} className={styles.container}>
       {tools && (
-      <section ref={toolBarRef} className={styles.toolBar}>
-        {Object.values(tools).map((element) => {
-          const { name, icon } = element
-          return (
+        <section ref={toolBarRef} className={styles.toolBar}>
+          {tools.map(({ name, icon }) => (
             <button
               key={name}
               type="button"
               className={cn(styles.tool, tool?.name === name && styles.active)}
-              onClick={() => onToolClick(element)}
+              onClick={() => changeTool(name)}
             >
               {icon}
             </button>
-          )
-        })}
-      </section>
+          ))}
+        </section>
       )}
       <section ref={mainRef} className={styles.main}>
         <canvas ref={gridRef} className={styles.canvas} />
@@ -201,3 +136,25 @@ export default function Editor() {
     </section>
   )
 }
+
+const tools: {
+  name: ToolType
+  icon: ReactNode
+}[] = [
+  {
+    name: 'select',
+    icon: <RiCursorLine size={24} />,
+  },
+  {
+    name: 'assign',
+    icon: <BiSelection size={24} />,
+  },
+  {
+    name: 'erase',
+    icon: <RiEraserLine size={24} />,
+  },
+  {
+    name: 'indexer',
+    icon: <ImSortNumericAsc size={20} />,
+  },
+]

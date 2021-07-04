@@ -1,10 +1,10 @@
 import { Vector2 } from 'lib/util/mathf'
 
-export default class Cell {
+export default abstract class Cell {
   public readonly position: Vector2
   private readonly color: string
 
-  constructor(x: number, y: number, color: string = 'rgba(0, 0, 0, .2)') {
+  constructor(x: number, y: number, color: string) {
     this.position = { x, y }
     this.color = color
   }

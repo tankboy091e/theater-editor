@@ -1,12 +1,12 @@
 import { IDraggable } from 'lib/entity'
 import { Vector2 } from 'lib/util/mathf'
 import getPosition from 'lib/util/mouseEvent'
-import Tool, { EditorData, ToolType } from '.'
+import Tool, { ToolData, ToolType } from '.'
 
 export default abstract class DraggableTool extends Tool implements IDraggable {
   protected position : Vector2
 
-  constructor(name: ToolType, data: EditorData) {
+  constructor(name: ToolType, data: ToolData) {
     super(name, data)
     this.bindDragListeners()
   }
@@ -47,17 +47,51 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
   }
 
   public onDragEnd(): void {
-    this.detachListeners()
-    this.clearUI()
+    this.onDragClear()
   }
 
   public onDragCancle(): void {
-    this.onDragEnd()
+    this.onDragClear()
+  }
+
+  public onDragClear() : void {
+    this.detachListeners()
+    this.clearUI()
   }
 
   public onKeyDown(e: KeyboardEvent) {
     if (e.key === 'Escape') {
       this.onDragCancle()
+    }
+  }
+
+  protected loopRange(func: (i: number, j: number) => void) {
+    const { size, gap, cells } = this.gridData
+
+    const { origin } = this.uiData
+
+    const from = {
+      x: origin.x < this.position.x ? origin.x : this.position.x,
+      y: origin.y < this.position.y ? origin.y : this.position.y,
+    }
+
+    const to = {
+      x: origin.x > this.position.x ? origin.x : this.position.x,
+      y: origin.y > this.position.y ? origin.y : this.position.y,
+    }
+
+    const column = {
+      min: Math.max(Math.floor(from.y / (size + gap)), 0),
+      max: Math.min(Math.round(to.y / (size + gap)), cells.length),
+    }
+    for (let i = column.min; i < column.max; i++) {
+      const row = {
+        min: Math.max(Math.floor(from.x / (size + gap)), 0),
+        max: Math.min(Math.round(to.x / (size + gap)), cells[i].length),
+      }
+      for (let j = row.min; j < row.max; j++) {
+        func(i, j)
+      }
     }
   }
 

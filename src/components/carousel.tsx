@@ -1,5 +1,5 @@
 import getDeviceType from 'lib/util/device'
-import clamp from 'lib/util/mathf'
+import { clamp } from 'lib/util/mathf'
 import getPosition from 'lib/util/mouseEvent'
 import React, {
   createContext, useContext, useEffect, useRef, useState,
