@@ -1,4 +1,4 @@
-export default function clamp(x: number, min: number, max: number) {
+export function clamp(x: number, min: number, max: number) {
   if (x < min) {
     return min
   }
@@ -6,4 +6,9 @@ export default function clamp(x: number, min: number, max: number) {
     return max
   }
   return x
+}
+
+export interface Vector2 {
+  x: number,
+  y: number,
 }
