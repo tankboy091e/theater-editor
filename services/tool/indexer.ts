@@ -5,8 +5,15 @@ import { ToolData } from '.'
 import DraggableTool from './draggable'
 
 export default class IndexerTool extends DraggableTool {
+  protected static linebreakingInitialize = '줄바꿈시 1번부터 시작'
+  protected static passageInitialize = '통로를 지나면 1번부터 시작'
+
   constructor(data: ToolData) {
     super('indexer', data)
+    this.metadata.name = '색인'
+    this.metadata.description = '좌석에 번호를 매깁니다.'
+    this.metadata.options[IndexerTool.linebreakingInitialize] = false
+    this.metadata.options[IndexerTool.passageInitialize] = false
   }
 
   public onDrag(e: MouseEvent) {
@@ -37,6 +44,13 @@ export default class IndexerTool extends DraggableTool {
   public onDragEnd(): void {
     super.onDragEnd()
 
+    let index = 1
+
+    const previous = {
+      x: undefined,
+      y: undefined,
+    }
+
     this.gridData.temporarySelectedCells
       .sort((a, b) => {
         const { x: aX, y: aY } = a.target.position
@@ -47,9 +61,27 @@ export default class IndexerTool extends DraggableTool {
         if (aX < bX) return -1
         return 0
       })
-      .forEach((element, index) => {
+      .forEach((element) => {
         const { x, y } = element.target.position
-        element.target = new IndexAssigendCell(x, y, index + 1)
+
+        if (this.metadata.options[IndexerTool.linebreakingInitialize]) {
+          if (previous.y !== y) {
+            index = 1
+          }
+        }
+
+        if (this.metadata.options[IndexerTool.passageInitialize]) {
+          if (previous.y === y && previous.x !== x - (this.gridData.size + this.gridData.gap)) {
+            index = 1
+          }
+        }
+
+        element.target = new IndexAssigendCell(x, y, index)
+
+        previous.x = x
+        previous.y = y
+
+        index += 1
       })
 
     this.gridData.initializeTemporaryCell()

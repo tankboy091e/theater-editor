@@ -15,6 +15,7 @@ import { BiSelection } from 'react-icons/bi'
 import { ImSortNumericAsc } from 'react-icons/im'
 import Grid from 'lib/entity/grid'
 import Ui from 'lib/entity/ui'
+import Inspector from 'components/inspector'
 
 export default function Editor() {
   const editorDataRef = useRef<ToolData>({
@@ -121,22 +122,20 @@ export default function Editor() {
 
   return (
     <section ref={containerRef} className={styles.container}>
-      {tools && (
-        <section ref={toolBarRef} className={styles.toolBar}>
-          {tools.map(({ name, icon }) => (
-            <button
-              key={name}
-              type="button"
-              className={cn(styles.tool, tool?.name === name && styles.active)}
-              onClick={() => changeTool(name)}
-            >
-              {icon}
-            </button>
-          ))}
-        </section>
-      )}
+      <section ref={toolBarRef} className={styles.toolBar}>
+        {tools.map(({ name, icon }) => (
+          <button
+            key={name}
+            type="button"
+            className={cn(styles.tool, tool?.name === name && styles.active)}
+            onClick={() => changeTool(name)}
+          >
+            {icon}
+          </button>
+        ))}
+      </section>
       <div className={styles.body}>
-        <section className={styles.inspector} />
+        <Inspector tool={tool} />
         <section ref={mainRef} className={styles.main}>
           <canvas ref={gridRef} className={styles.canvas} />
           <canvas ref={uiRef} className={styles.ui} />

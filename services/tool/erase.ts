@@ -7,6 +7,8 @@ import DraggableTool from './draggable'
 export default class EraseTool extends DraggableTool {
   constructor(data: ToolData) {
     super('erase', data)
+    this.metadata.name = '지우개'
+    this.metadata.description = '할당된 좌석을 지웁니다.'
   }
 
   public onDrag(e: MouseEvent) {

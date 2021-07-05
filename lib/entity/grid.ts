@@ -47,6 +47,7 @@ export default class Grid extends Canvas {
     this._temporarySelectedCells = {}
     this._assignedCells = {}
     this.initializeCells()
+    this.update()
   }
 
   private initializeCells() {

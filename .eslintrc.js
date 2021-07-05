@@ -21,6 +21,7 @@ module.exports = {
   ],
   rules: {
     semi: [2, 'never'],
+    'no-underscore-dangle': 'off',
     'class-methods-use-this': 'off',
     'no-restricted-syntax': 'off',
     'no-shadow': 'off',

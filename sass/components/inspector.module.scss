@@ -1,0 +1,27 @@
+@use '../lib/colors.scss' as colors;
+
+.container {
+    padding: 1rem;
+    width: 256px;
+    color: rgba(colors.$primary, .8);
+    border-right: 1px solid rgba(black, .3);
+}
+
+.description {
+    margin-top: .25rem;
+}
+
+.options {
+    border-top: 1px solid rgba(black, .2);
+    margin-top: 1rem;
+    list-style: none;
+    padding: 1rem 0;
+}
+
+.title {
+    margin-bottom: .5rem;
+}
+
+.value {
+    margin-left: .5rem;
+}

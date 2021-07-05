@@ -8,8 +8,20 @@ export interface ToolData {
   uiData: Ui
 }
 
+interface Options {
+  [property: string] : any
+}
+
+interface Metadata {
+  name: string
+  description: string
+  options : Options
+}
+
 export default abstract class Tool {
   public readonly name: ToolType
+  public readonly metadata: Metadata
+
   protected gridData: Grid
   protected uiData: Ui
 
@@ -17,6 +29,10 @@ export default abstract class Tool {
     this.name = name
     this.gridData = data.gridData
     this.uiData = data.uiData
-    this.gridData.update()
+    this.metadata = {
+      name: '',
+      description: '',
+      options: {},
+    }
   }
 }

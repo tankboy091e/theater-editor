@@ -7,6 +7,8 @@ import DraggableTool from './draggable'
 export default class AssignTool extends DraggableTool {
   constructor(data: ToolData) {
     super('assign', data)
+    this.metadata.name = '할당'
+    this.metadata.description = '좌석을 새로 할당합니다.'
   }
 
   public onDrag(e: MouseEvent): void {
