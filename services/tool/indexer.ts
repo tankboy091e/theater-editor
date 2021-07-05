@@ -5,15 +5,17 @@ import { ToolData } from '.'
 import DraggableTool from './draggable'
 
 export default class IndexerTool extends DraggableTool {
-  protected static linebreakingInitialize = '줄바꿈시 1번부터 시작'
-  protected static passageInitialize = '통로를 지나면 1번부터 시작'
+  protected static startNumberInitialize = '시작 번호'
+  protected static linebreakingInitialize = '줄바꿈시 처음부터 시작'
+  protected static passageInitialize = '통로를 지나면 처음부터 시작'
 
   constructor(data: ToolData) {
     super('indexer', data)
     this.metadata.name = '색인'
     this.metadata.description = '좌석에 번호를 매깁니다.'
-    this.metadata.options[IndexerTool.linebreakingInitialize] = false
-    this.metadata.options[IndexerTool.passageInitialize] = false
+    this._options[IndexerTool.startNumberInitialize] = 1
+    this._options[IndexerTool.linebreakingInitialize] = false
+    this._options[IndexerTool.passageInitialize] = false
   }
 
   public onDrag(e: MouseEvent) {
@@ -44,7 +46,9 @@ export default class IndexerTool extends DraggableTool {
   public onDragEnd(): void {
     super.onDragEnd()
 
-    let index = 1
+    const start = this._options[IndexerTool.startNumberInitialize]
+
+    let index = start
 
     const previous = {
       x: undefined,
@@ -64,15 +68,15 @@ export default class IndexerTool extends DraggableTool {
       .forEach((element) => {
         const { x, y } = element.target.position
 
-        if (this.metadata.options[IndexerTool.linebreakingInitialize]) {
+        if (this._options[IndexerTool.linebreakingInitialize]) {
           if (previous.y !== y) {
-            index = 1
+            index = start
           }
         }
 
-        if (this.metadata.options[IndexerTool.passageInitialize]) {
+        if (this._options[IndexerTool.passageInitialize]) {
           if (previous.y === y && previous.x !== x - (this.gridData.size + this.gridData.gap)) {
-            index = 1
+            index = start
           }
         }
 

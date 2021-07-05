@@ -18,6 +18,19 @@
     padding: 1rem 0;
 }
 
+.option {
+    position: relative;
+    & + & {
+        margin-top: .25rem;
+    }
+}
+
+.inputNumber {
+    width: 20%;
+    border: 1px solid rgba(black, .2);
+    text-align: center;
+}
+
 .title {
     margin-bottom: .5rem;
 }

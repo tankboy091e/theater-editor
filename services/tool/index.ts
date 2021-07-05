@@ -15,12 +15,12 @@ interface Options {
 interface Metadata {
   name: string
   description: string
-  options : Options
 }
 
 export default abstract class Tool {
   public readonly name: ToolType
   public readonly metadata: Metadata
+  protected readonly _options : Options
 
   protected gridData: Grid
   protected uiData: Ui
@@ -32,7 +32,20 @@ export default abstract class Tool {
     this.metadata = {
       name: '',
       description: '',
-      options: {},
     }
+    this._options = {}
+  }
+
+  public get options() {
+    return Object.entries(this._options).map(([key, value]) => (
+      {
+        key,
+        value,
+      }
+    ))
+  }
+
+  public setOption(key: string, value: any) {
+    this._options[key] = value
   }
 }
