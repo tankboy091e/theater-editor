@@ -22,7 +22,7 @@ export default class IndexAssigendCell extends AssignedCell {
     context.fillText(
       this.index.toString(),
       this.position.x + size * 0.5,
-      this.position.y + size * 0.5,
+      this.position.y + size * 0.5 + 1,
     )
   }
 }
