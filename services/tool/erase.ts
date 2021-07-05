@@ -9,6 +9,8 @@ export default class EraseTool extends DraggableTool {
     super('erase', data)
     this.metadata.name = '지우개'
     this.metadata.description = '할당된 좌석을 지웁니다.'
+    this.stokeStyle = 'rgba(196, 37, 64, .7)'
+    this.fillStyle = 'rgba(196, 37, 64, .3)'
   }
 
   public onDrag(e: MouseEvent) {

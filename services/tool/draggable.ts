@@ -2,8 +2,8 @@ import { IDraggable } from 'lib/entity'
 import Tool, { ToolData, ToolType } from '.'
 
 export default abstract class DraggableTool extends Tool implements IDraggable {
-  protected static stokeStyle = 'rgba(196, 37, 64, .7)'
-  protected static fillStyle = 'rgba(196, 37, 64, .3)'
+  protected stokeStyle = 'rgba(0, 90, 244, .7)'
+  protected fillStyle = 'rgba(0, 90, 244, .3)'
 
   constructor(name: ToolType, data: ToolData) {
     super(name, data)
@@ -19,8 +19,8 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     this.uiData.updatePosition(e)
 
     this.uiData.drawRange({
-      stroke: DraggableTool.stokeStyle,
-      fill: DraggableTool.fillStyle,
+      stroke: this.stokeStyle,
+      fill: this.fillStyle,
     })
   }
 
