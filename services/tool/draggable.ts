@@ -5,6 +5,8 @@ import Tool, { ToolData, ToolType } from '.'
 
 export default abstract class DraggableTool extends Tool implements IDraggable {
   protected position : Vector2
+  protected static stokeStyle = 'rgba(196, 37, 64, .7)'
+  protected static fillStyle = 'rgba(196, 37, 64, .3)'
 
   constructor(name: ToolType, data: ToolData) {
     super(name, data)
@@ -30,14 +32,14 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
       origin, context,
     } = this.uiData
     this.clearUI()
-    context.strokeStyle = 'rgba(196, 37, 64, .7)'
+    context.strokeStyle = DraggableTool.stokeStyle
     context.strokeRect(
       origin.x,
       origin.y,
       this.position.x - origin.x,
       this.position.y - origin.y,
     )
-    context.fillStyle = 'rgba(196, 37, 64, .3)'
+    context.fillStyle = DraggableTool.fillStyle
     context.fillRect(
       origin.x,
       origin.y,
@@ -65,40 +67,86 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     }
   }
 
+  protected indicate() {
+    const { row, column } = this.getTemporaryGridRange()
+    if (row < 1 || column < 1) {
+      return
+    }
+
+    const { context } = this.uiData
+    const to = this.getDragTo()
+    const size = 16
+
+    context.font = `${size}px Lato`
+    context.fillStyle = 'rgba(0, 0, 0, .8)'
+    context.fillText(`${row}×${column}`, to.x + 4, to.y)
+  }
+
   protected loopRange(func: (i: number, j: number) => void) {
-    const { size, gap, cells } = this.gridData
-
-    const { origin } = this.uiData
-
-    const from = {
-      x: origin.x < this.position.x ? origin.x : this.position.x,
-      y: origin.y < this.position.y ? origin.y : this.position.y,
-    }
-
-    const to = {
-      x: origin.x > this.position.x ? origin.x : this.position.x,
-      y: origin.y > this.position.y ? origin.y : this.position.y,
-    }
-
-    const column = {
-      min: Math.max(Math.floor(from.y / (size + gap)), 0),
-      max: Math.min(Math.round(to.y / (size + gap)), cells.length),
-    }
+    const column = this.getColumn()
     for (let i = column.min; i < column.max; i++) {
-      const row = {
-        min: Math.max(Math.floor(from.x / (size + gap)), 0),
-        max: Math.min(Math.round(to.x / (size + gap)), cells[i].length),
-      }
+      const row = this.getRow(i)
       for (let j = row.min; j < row.max; j++) {
         func(i, j)
       }
     }
   }
 
-  private calibrateMousePosition = (position: Vector2) => {
+  private getDragRange() {
+    return {
+      from: this.getDragFrom(),
+      to: this.getDragTo(),
+    }
+  }
+
+  private getDragFrom() {
+    const { origin } = this.uiData
+    return {
+      x: origin.x < this.position.x ? origin.x : this.position.x,
+      y: origin.y < this.position.y ? origin.y : this.position.y,
+    }
+  }
+
+  private getDragTo() {
+    const { origin } = this.uiData
+    return {
+      x: origin.x > this.position.x ? origin.x : this.position.x,
+      y: origin.y > this.position.y ? origin.y : this.position.y,
+    }
+  }
+
+  private getColumn() {
+    const { size, gap, cells } = this.gridData
+    const { from, to } = this.getDragRange()
+    return {
+      min: Math.max(Math.floor(from.y / (size + gap)), 0),
+      max: Math.min(Math.round(to.y / (size + gap)), cells.length),
+    }
+  }
+
+  private getRow(column: number) {
+    const { size, gap, cells } = this.gridData
+    const { from, to } = this.getDragRange()
+    return {
+      min: Math.max(Math.floor(from.x / (size + gap)), 0),
+      max: Math.min(Math.round(to.x / (size + gap)), cells[column].length),
+    }
+  }
+
+  private getTemporaryGridRange() {
+    const columnRange = this.getColumn()
+    const rowRange = this.getRow(columnRange.min)
+    return {
+      row: rowRange.max - rowRange.min,
+      column: columnRange.max - columnRange.min,
+    }
+  }
+
+  private calibrateMousePosition(position: Vector2) {
     const result = position
-    result.x -= this.containerRef.current.offsetLeft - this.containerRef.current.scrollLeft
-    result.y -= this.containerRef.current.offsetTop - this.containerRef.current.scrollTop
+    const rect = this.containerRef.current.getBoundingClientRect()
+    result.x -= rect.left - this.containerRef.current.scrollLeft
+    result.y -= rect.top - this.containerRef.current.scrollTop
     return result
   }
 

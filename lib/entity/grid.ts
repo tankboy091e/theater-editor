@@ -5,6 +5,7 @@ import Cell from './cell'
 import DefaultCell from './cell/default'
 
 interface CellData {
+  previous: Cell
   target: Cell
 }
 
@@ -45,11 +46,11 @@ export default class Grid extends Canvas {
   }
 
   private initializeCells() {
-    for (let i = this.gap; i < this.height; i += this.size + this.gap) {
+    for (let y = this.gap; y < this.height; y += this.size + this.gap) {
       const row = []
-      for (let j = this.gap; j < this.width; j += this.size + this.gap) {
+      for (let x = this.gap; x < this.width; x += this.size + this.gap) {
         row.push({
-          target: new DefaultCell(j, i),
+          target: new DefaultCell(x, y),
         })
       }
       this.cells.push(row)

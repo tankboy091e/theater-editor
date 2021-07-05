@@ -1,6 +1,6 @@
+import AssignedCell from 'lib/entity/cell/assigned'
 import DefaultCell from 'lib/entity/cell/default'
 import ErasedCell from 'lib/entity/cell/erased'
-import SelectedCell from 'lib/entity/cell/selected'
 import { ToolData } from '.'
 import DraggableTool from './draggable'
 
@@ -16,27 +16,22 @@ export default class EraseTool extends DraggableTool {
     this.loopRange((i, j) => {
       const cell = this.gridData.cells[i][j]
       result.push(cell)
-      if (cell.target instanceof SelectedCell) {
+      if (cell.target instanceof AssignedCell) {
         const { x, y } = cell.target.position
+        cell.previous = cell.target
         cell.target = new ErasedCell(x, y)
         this.gridData.selectTemporaryCell(i, j)
       }
     })
 
-    for (const element of this.gridData.temporarySelectedCells) {
+    this.gridData.temporarySelectedCells.forEach((element) => {
       if (!result.includes(element)) {
-        const assigendCells = this.gridData.assignedCells
-        if (assigendCells.length > 0) {
-          if (assigendCells.includes(element)) {
-            const { x, y } = element.target.position
-            element.target = new SelectedCell(x, y)
-            this.gridData.deleteTemporaryCell(element)
-          }
-        }
+        element.target = element.previous
+        this.gridData.deleteTemporaryCell(element)
       }
-    }
+    })
 
-    this.update()
+    this.updateGrid()
   }
 
   public onDragEnd(): void {
@@ -49,18 +44,19 @@ export default class EraseTool extends DraggableTool {
     })
 
     this.gridData.initializeTemporaryCell()
-    this.update()
+
+    this.updateGrid()
   }
 
   public onDragCancle(): void {
     super.onDragCancle()
 
     this.gridData.temporarySelectedCells.forEach((element) => {
-      const { x, y } = element.target.position
-      element.target = new SelectedCell(x, y)
+      element.target = element.previous
     })
 
     this.gridData.initializeTemporaryCell()
-    this.update()
+
+    this.updateGrid()
   }
 }

@@ -1,9 +1,10 @@
 import Cell from '.'
 
 export default class ErasedCell extends Cell {
-  private static color = 'rgba(230, 10, 10, 1)'
-  constructor(x: number, y: number) {
-    super(x, y, ErasedCell.color)
+  private static readonly color = 'rgba(230, 10, 10, 1)'
+
+  protected get strokeStyle() {
+    return ErasedCell.color
   }
 
   public draw(context: CanvasRenderingContext2D, size: number) {

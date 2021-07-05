@@ -37,13 +37,22 @@ $padding: 4px;
     }
 }
 
+.body {
+    flex: 1;
+    position: relative;
+    display: flex;
+    overflow: hidden;
+}
+
+.inspector {
+    width: 256px;
+    border-right: 1px solid rgba(black, .3);
+}
+
 .main {
     position: relative;
-    width: 100vw;
     flex: 1;
-    overflow-x: scroll;
-    overflow-y: scroll;
-
+    overflow: scroll;
     @include util.scroll-bar();
 }
 

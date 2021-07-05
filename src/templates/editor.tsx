@@ -89,7 +89,7 @@ export default function Editor() {
 
   const initialize = () => {
     editorDataRef.current.gridData = new Grid(gridRef, {
-      size: 18, gap: 6, column: 100, row: 100,
+      size: 22, gap: 6, column: 100, row: 100,
     })
     editorDataRef.current.uiData = new Ui(uiRef, editorDataRef.current.gridData)
     editorDataRef.current.containerRef = mainRef
@@ -129,10 +129,13 @@ export default function Editor() {
           ))}
         </section>
       )}
-      <section ref={mainRef} className={styles.main}>
-        <canvas ref={gridRef} className={styles.canvas} />
-        <canvas ref={uiRef} className={styles.ui} />
-      </section>
+      <div className={styles.body}>
+        <section className={styles.inspector} />
+        <section ref={mainRef} className={styles.main}>
+          <canvas ref={gridRef} className={styles.canvas} />
+          <canvas ref={uiRef} className={styles.ui} />
+        </section>
+      </div>
     </section>
   )
 }

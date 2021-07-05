@@ -21,10 +21,10 @@ export default abstract class Tool {
     this.gridData = data.gridData
     this.uiData = data.uiData
     this.containerRef = data.containerRef
-    this.update()
+    this.updateGrid()
   }
 
-  protected update() {
+  protected updateGrid() {
     this.clearGrid()
     this.gridData.cells.forEach((array) => array.forEach((element) => {
       element.target.draw(this.gridData.context, this.gridData.size)
