@@ -29,10 +29,14 @@ export default class Grid extends Canvas {
   private _temporarySelectedCells: CellList
   private _assignedCells: CellList
 
-  constructor(ref: MutableRefObject<HTMLCanvasElement>, {
-    size, column, row, gap,
-  }: Props) {
-    super(ref)
+  constructor(
+    ref: MutableRefObject<HTMLCanvasElement>,
+    containerRef: MutableRefObject<HTMLElement>,
+    {
+      size, column, row, gap,
+    }: Props,
+  ) {
+    super(ref, containerRef)
     this.size = size
     this.column = column
     this.row = row
@@ -92,5 +96,12 @@ export default class Grid extends Canvas {
       ([_, element]) => element === cellData,
     )
     delete this._assignedCells[key]
+  }
+
+  public update() {
+    super.update()
+    this.cells.forEach((array) => array.forEach((element) => {
+      element.target.draw(this.context, this.size)
+    }))
   }
 }

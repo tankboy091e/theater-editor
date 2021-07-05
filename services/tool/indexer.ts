@@ -31,7 +31,7 @@ export default class IndexerTool extends DraggableTool {
       }
     })
 
-    this.updateGrid()
+    this.gridData.update()
   }
 
   public onDragEnd(): void {
@@ -54,7 +54,7 @@ export default class IndexerTool extends DraggableTool {
 
     this.gridData.initializeTemporaryCell()
 
-    this.updateGrid()
+    this.gridData.update()
   }
 
   public onDragCancle(): void {
@@ -65,6 +65,6 @@ export default class IndexerTool extends DraggableTool {
     })
 
     this.gridData.initializeTemporaryCell()
-    this.updateGrid()
+    this.gridData.update()
   }
 }

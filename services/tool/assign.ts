@@ -33,7 +33,7 @@ export default class AssignTool extends DraggableTool {
       }
     })
 
-    this.updateGrid()
+    this.gridData.update()
   }
 
   public onDragEnd(): void {
@@ -47,7 +47,7 @@ export default class AssignTool extends DraggableTool {
     this.gridData.assignTemporaryCell()
     this.gridData.initializeTemporaryCell()
 
-    this.updateGrid()
+    this.gridData.update()
   }
 
   public onDragCancle(): void {
@@ -62,6 +62,6 @@ export default class AssignTool extends DraggableTool {
 
     this.gridData.initializeTemporaryCell()
 
-    this.updateGrid()
+    this.gridData.update()
   }
 }

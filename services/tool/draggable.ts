@@ -1,10 +1,7 @@
 import { IDraggable } from 'lib/entity'
-import { Vector2 } from 'lib/util/mathf'
-import getPosition from 'lib/util/mouseEvent'
 import Tool, { ToolData, ToolType } from '.'
 
 export default abstract class DraggableTool extends Tool implements IDraggable {
-  protected position : Vector2
   protected static stokeStyle = 'rgba(196, 37, 64, .7)'
   protected static fillStyle = 'rgba(196, 37, 64, .3)'
 
@@ -13,52 +10,31 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     this.bindDragListeners()
   }
 
-  private bindDragListeners() {
-    this.onDrag = this.onDrag.bind(this)
-    this.onDragStart = this.onDragStart.bind(this)
-    this.onDragEnd = this.onDragEnd.bind(this)
-    this.onDragCancle = this.onDragCancle.bind(this)
-    this.onKeyDown = this.onKeyDown.bind(this)
-  }
-
   public onDragStart(e: MouseEvent): void {
     this.attachListeners()
-    this.uiData.origin = this.getPosition(e)
+    this.uiData.updateOrigin(e)
   }
 
   public onDrag(e: MouseEvent): void {
-    this.position = this.getPosition(e)
-    const {
-      origin, context,
-    } = this.uiData
-    this.clearUI()
-    context.strokeStyle = DraggableTool.stokeStyle
-    context.strokeRect(
-      origin.x,
-      origin.y,
-      this.position.x - origin.x,
-      this.position.y - origin.y,
-    )
-    context.fillStyle = DraggableTool.fillStyle
-    context.fillRect(
-      origin.x,
-      origin.y,
-      this.position.x - origin.x,
-      this.position.y - origin.y,
-    )
+    this.uiData.updatePosition(e)
+
+    this.uiData.drawRange({
+      stroke: DraggableTool.stokeStyle,
+      fill: DraggableTool.fillStyle,
+    })
   }
 
   public onDragEnd(): void {
-    this.onDragClear()
+    this.onDragFinish()
   }
 
   public onDragCancle(): void {
-    this.onDragClear()
+    this.onDragFinish()
   }
 
-  public onDragClear() : void {
+  public onDragFinish() : void {
     this.detachListeners()
-    this.clearUI()
+    this.uiData.clear()
   }
 
   public onKeyDown(e: KeyboardEvent) {
@@ -73,13 +49,8 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
       return
     }
 
-    const { context } = this.uiData
-    const to = this.getDragTo()
-    const size = 16
-
-    context.font = `${size}px Lato`
-    context.fillStyle = 'rgba(0, 0, 0, .8)'
-    context.fillText(`${row}×${column}`, to.x + 4, to.y)
+    const location = this.getDragTo()
+    this.uiData.indicate(row, column, location.x + 4, location.y)
   }
 
   protected loopRange(func: (i: number, j: number) => void) {
@@ -100,18 +71,18 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
   }
 
   private getDragFrom() {
-    const { origin } = this.uiData
+    const { origin, position } = this.uiData
     return {
-      x: origin.x < this.position.x ? origin.x : this.position.x,
-      y: origin.y < this.position.y ? origin.y : this.position.y,
+      x: origin.x < position.x ? origin.x : position.x,
+      y: origin.y < position.y ? origin.y : position.y,
     }
   }
 
   private getDragTo() {
-    const { origin } = this.uiData
+    const { origin, position } = this.uiData
     return {
-      x: origin.x > this.position.x ? origin.x : this.position.x,
-      y: origin.y > this.position.y ? origin.y : this.position.y,
+      x: origin.x > position.x ? origin.x : position.x,
+      y: origin.y > position.y ? origin.y : position.y,
     }
   }
 
@@ -142,14 +113,6 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     }
   }
 
-  private calibrateMousePosition(position: Vector2) {
-    const result = position
-    const rect = this.containerRef.current.getBoundingClientRect()
-    result.x -= rect.left - this.containerRef.current.scrollLeft
-    result.y -= rect.top - this.containerRef.current.scrollTop
-    return result
-  }
-
   private attachListeners() {
     this.uiData.ref.current.addEventListener('mouseup', this.onDragEnd)
     this.uiData.ref.current.addEventListener('mousemove', this.onDrag)
@@ -160,7 +123,11 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     this.uiData.ref.current.removeEventListener('mousemove', this.onDrag)
   }
 
-  protected getPosition(e: MouseEvent) {
-    return this.calibrateMousePosition(getPosition(e))
+  private bindDragListeners() {
+    this.onDrag = this.onDrag.bind(this)
+    this.onDragStart = this.onDragStart.bind(this)
+    this.onDragEnd = this.onDragEnd.bind(this)
+    this.onDragCancle = this.onDragCancle.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
   }
 }

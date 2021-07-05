@@ -20,7 +20,6 @@ export default function Editor() {
   const editorDataRef = useRef<ToolData>({
     gridData: null,
     uiData: null,
-    containerRef: null,
   })
 
   const [tool, setTool] = useState<Tool>(null)
@@ -88,11 +87,18 @@ export default function Editor() {
   }
 
   const initialize = () => {
-    editorDataRef.current.gridData = new Grid(gridRef, {
-      size: 22, gap: 6, column: 100, row: 100,
-    })
-    editorDataRef.current.uiData = new Ui(uiRef, editorDataRef.current.gridData)
-    editorDataRef.current.containerRef = mainRef
+    editorDataRef.current.gridData = new Grid(
+      gridRef,
+      mainRef,
+      {
+        size: 22, gap: 6, column: 100, row: 100,
+      },
+    )
+    editorDataRef.current.uiData = new Ui(
+      uiRef,
+      mainRef,
+      editorDataRef.current.gridData,
+    )
   }
 
   const initializeControl = () => {
