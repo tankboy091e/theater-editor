@@ -29,7 +29,7 @@ export default abstract class Tool {
     }))
   }
 
-  public setOption(key: string, value: any) {
+  public setOption(key: string, value: any) : void {
     this._options[key] = value
   }
 }

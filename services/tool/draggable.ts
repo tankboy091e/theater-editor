@@ -1,5 +1,6 @@
 import { IDraggable } from 'lib/entity'
 import { ToolData, ToolType } from 'lib/entity/tool'
+import KeyboardEventListener from 'services/keyboard'
 import Tool from '.'
 
 export default abstract class DraggableTool extends Tool implements IDraggable {
@@ -9,6 +10,8 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
   constructor(name: ToolType, data: ToolData) {
     super(name, data)
     this.bindDragListeners()
+    KeyboardEventListener.instance
+      .on('Escape', this.onDragCancle)
   }
 
   public onDragStart(e: MouseEvent): void {
@@ -38,13 +41,7 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     this.uiData.clear()
   }
 
-  public onKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Escape') {
-      this.onDragCancle()
-    }
-  }
-
-  protected indicate() {
+  protected indicate() : void {
     const { row, column } = this.getTemporaryGridRange()
     if (row < 1 || column < 1) {
       return
@@ -129,6 +126,5 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     this.onDragStart = this.onDragStart.bind(this)
     this.onDragEnd = this.onDragEnd.bind(this)
     this.onDragCancle = this.onDragCancle.bind(this)
-    this.onKeyDown = this.onKeyDown.bind(this)
   }
 }

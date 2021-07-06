@@ -30,7 +30,7 @@ export default class Ui extends Canvas {
     return this._position
   }
 
-  public drawRange(style?: { stroke: string, fill: string}) {
+  public drawRange(style?: { stroke: string, fill: string}) : void {
     this.clear()
     this.context.strokeStyle = style?.stroke || Ui.DEFAULT_STROKE_STYLE
     this.context.strokeRect(
@@ -48,7 +48,7 @@ export default class Ui extends Canvas {
     )
   }
 
-  public indicate(row: number, column: number, x: number, y: number) {
+  public indicate(row: number, column: number, x: number, y: number) : void {
     if (row < 1 || column < 1) {
       return
     }
@@ -57,19 +57,19 @@ export default class Ui extends Canvas {
     this.context.fillText(`${row}×${column}`, x, y)
   }
 
-  public updateOrigin(e: MouseEvent) {
+  public updateOrigin(e: MouseEvent) : void {
     this._origin = this.getPosition(e)
   }
 
-  public updatePosition(e: MouseEvent) {
+  public updatePosition(e: MouseEvent) : void {
     this._position = this.getPosition(e)
   }
 
-  protected getPosition(e: MouseEvent) {
+  protected getPosition(e: MouseEvent) : Vector2 {
     return this.calibrateMousePosition(getPosition(e))
   }
 
-  private calibrateMousePosition(position: Vector2) {
+  private calibrateMousePosition(position: Vector2) : Vector2 {
     const result = position
     const { current } = this.containerRef
     const rect = current.getBoundingClientRect()

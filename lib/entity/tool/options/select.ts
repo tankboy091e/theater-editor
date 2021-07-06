@@ -8,7 +8,7 @@ export default class SelectOption extends Option<string> {
     this._values = values
   }
 
-  public get values() {
+  public get values() : string[] {
     return this._values
   }
 }

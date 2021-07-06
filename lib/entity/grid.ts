@@ -50,7 +50,7 @@ export default class Grid extends Canvas {
     this.update()
   }
 
-  private initializeCells() {
+  private initializeCells() : void {
     for (let y = this.gap; y < this.height; y += this.size + this.gap) {
       const row = []
       for (let x = this.gap; x < this.width; x += this.size + this.gap) {
@@ -70,36 +70,36 @@ export default class Grid extends Canvas {
     return Object.values(this._assignedCells)
   }
 
-  public selectTemporaryCell(x: number, y: number) {
+  public selectTemporaryCell(x: number, y: number) : void {
     this._temporarySelectedCells[`${x}-${y}`] = this.cells[x][y]
   }
 
-  public assignTemporaryCell() {
+  public assignTemporaryCell() : void {
     this._assignedCells = {
       ...this._assignedCells,
       ...this._temporarySelectedCells,
     }
   }
 
-  public deleteTemporaryCell(cellData: CellData) {
+  public deleteTemporaryCell(cellData: CellData) : void {
     const [key] = Object.entries(this._temporarySelectedCells).find(
       ([_, element]) => element === cellData,
     )
     delete this._temporarySelectedCells[key]
   }
 
-  public initializeTemporaryCell() {
+  public initializeTemporaryCell() : void {
     this._temporarySelectedCells = {}
   }
 
-  public deleteAssignedCell(cellData: CellData) {
+  public deleteAssignedCell(cellData: CellData) : void {
     const [key] = Object.entries(this._assignedCells).find(
       ([_, element]) => element === cellData,
     )
     delete this._assignedCells[key]
   }
 
-  public update() {
+  public update() : void {
     super.update()
     this.cells.forEach((array) => array.forEach((element) => {
       element.target.draw(this.context, this.size)

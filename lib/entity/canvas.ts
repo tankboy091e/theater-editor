@@ -15,11 +15,11 @@ export default abstract class Canvas {
     this.ref.current.addEventListener('contextmenu', (e) => e.preventDefault())
   }
 
-  public get width() {
+  public get width() : number {
     return this.ref.current.width
   }
 
-  public get height() {
+  public get height() : number {
     return this.ref.current.height
   }
 
@@ -27,7 +27,7 @@ export default abstract class Canvas {
     this.clear()
   }
 
-  public clear() {
+  public clear() : void {
     this.context.clearRect(0, 0, this.width, this.height)
   }
 }

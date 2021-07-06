@@ -17,6 +17,7 @@ import Grid from 'lib/entity/grid'
 import Ui from 'lib/entity/ui'
 import Inspector from 'components/inspector'
 import { ToolData, ToolType } from 'lib/entity/tool'
+import KeyboardEventListener from 'services/keyboard'
 
 export default function Editor() {
   const editorDataRef = useRef<ToolData>({
@@ -59,28 +60,6 @@ export default function Editor() {
     }
   }
 
-  const onKeyDown = (e: KeyboardEvent) => {
-    switch (e.key.toLowerCase()) {
-      case 'v':
-        changeTool('select')
-        return
-      case 'a':
-        changeTool('assign')
-        return
-      case 'e':
-        changeTool('erase')
-        return
-      case 'i':
-        changeTool('indexer')
-        return
-      default:
-        break
-    }
-    if (toolRef.current instanceof DraggableTool) {
-      toolRef.current.onKeyDown(e)
-    }
-  }
-
   const setCenter = () => {
     mainRef.current.scrollTo(
       gridRef.current.clientWidth * 0.5 - mainRef.current.clientWidth * 0.5,
@@ -105,7 +84,11 @@ export default function Editor() {
 
   const initializeControl = () => {
     uiRef.current.addEventListener('mousedown', onDragStart)
-    window.addEventListener('keydown', onKeyDown)
+    KeyboardEventListener.instance
+      .on('v', () => changeTool('select'))
+      .on('a', () => changeTool('assign'))
+      .on('e', () => changeTool('erase'))
+      .on('i', () => changeTool('indexer'))
   }
 
   useResize(setCenter)

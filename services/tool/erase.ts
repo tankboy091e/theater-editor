@@ -13,7 +13,7 @@ export default class EraseTool extends DraggableTool {
     this.fillStyle = 'rgba(196, 37, 64, .3)'
   }
 
-  public onDrag(e: MouseEvent) {
+  public onDrag(e: MouseEvent) : void {
     super.onDrag(e)
 
     const result = []

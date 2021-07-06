@@ -5,7 +5,7 @@ export default abstract class Option<T = any> {
     this._value = value
   }
 
-  public get value() {
+  public get value() : T {
     return this._value
   }
 

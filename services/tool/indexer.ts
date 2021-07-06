@@ -38,7 +38,7 @@ export default class IndexerTool extends DraggableTool {
     this._options[IndexerTool.PASSAGE_INITIALIZE] = new BooleanOption(false)
   }
 
-  public onDrag(e: MouseEvent) {
+  public onDrag(e: MouseEvent) : void {
     super.onDrag(e)
 
     const result = []
@@ -124,7 +124,7 @@ export default class IndexerTool extends DraggableTool {
     this.gridData.update()
   }
 
-  private horizontalIndexer(a: any, b: any) {
+  private horizontalIndexer(a: any, b: any) : number {
     if (
       this._options[IndexerTool.HORIZONTAL_DIRECTION].value
       === IndexerTool.HONRIZONTAL_LEFT_TO_RIGHT
@@ -142,7 +142,7 @@ export default class IndexerTool extends DraggableTool {
     return 0
   }
 
-  private verticalIndexer(a: any, b: any) {
+  private verticalIndexer(a: any, b: any) : number {
     if (
       this._options[IndexerTool.VERTICAL_DIRECTION].value
       === IndexerTool.VERTICAL_UP_TO_DOWN
