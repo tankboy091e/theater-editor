@@ -45,17 +45,17 @@ export default class IndexerTool extends DraggableTool {
     this.loopRange((i, j) => {
       const cell = this.gridData.cells[i][j]
       result.push(cell)
-      if (cell.target instanceof AssignedCell) {
-        const { x, y } = cell.target.position
-        cell.previous = cell.target
-        cell.target = new IndexSelectedCell(x, y)
+      if (cell.current instanceof AssignedCell) {
+        const { x, y } = cell.current.position
+        cell.saveTemporary()
+        cell.current = new IndexSelectedCell(x, y)
         this.gridData.selectTemporaryCell(i, j)
       }
     })
 
     this.gridData.temporarySelectedCells.forEach((element) => {
       if (!result.includes(element)) {
-        element.target = element.previous
+        element.loadTemporary()
         this.gridData.deleteTemporaryCell(element)
       }
     })
@@ -77,8 +77,8 @@ export default class IndexerTool extends DraggableTool {
 
     this.gridData.temporarySelectedCells
       .sort((a, b) => {
-        const { x: aX, y: aY } = a.target.position
-        const { x: bX, y: bY } = b.target.position
+        const { x: aX, y: aY } = a.current.position
+        const { x: bX, y: bY } = b.current.position
         const result = this.verticalIndexer(aY, bY)
         if (result !== 0) {
           return result
@@ -86,7 +86,7 @@ export default class IndexerTool extends DraggableTool {
         return this.horizontalIndexer(aX, bX)
       })
       .forEach((element) => {
-        const { x, y } = element.target.position
+        const { x, y } = element.current.position
 
         if (this._options[IndexerTool.LINE_BREAKING_INITIALIZE].value) {
           if (previous.y !== y) {
@@ -100,7 +100,7 @@ export default class IndexerTool extends DraggableTool {
           }
         }
 
-        element.target = new IndexAssigendCell(x, y, index)
+        element.current = new IndexAssigendCell(x, y, index)
 
         previous.x = x
         previous.y = y
@@ -108,7 +108,7 @@ export default class IndexerTool extends DraggableTool {
         index += 1
       })
 
-    this.gridData.initializeTemporaryCell()
+    this.gridData.initializeTemporaryCells()
 
     this.gridData.update()
   }
@@ -117,10 +117,10 @@ export default class IndexerTool extends DraggableTool {
     super.onDragCancle()
 
     this.gridData.temporarySelectedCells.forEach((element) => {
-      element.target = element.previous
+      element.loadTemporary()
     })
 
-    this.gridData.initializeTemporaryCell()
+    this.gridData.initializeTemporaryCells()
     this.gridData.update()
   }
 

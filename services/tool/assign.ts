@@ -20,17 +20,17 @@ export default class AssignTool extends DraggableTool {
       const cell = this.gridData.cells[i][j]
       result.push(cell)
 
-      if (cell.target instanceof DefaultCell) {
+      if (cell.current instanceof DefaultCell) {
         this.gridData.selectTemporaryCell(i, j)
-        const { x, y } = cell.target.position
-        cell.previous = cell.target
-        cell.target = new SelectedCell(x, y)
+        const { x, y } = cell.current.position
+        cell.saveTemporary()
+        cell.current = new SelectedCell(x, y)
       }
     })
 
     this.gridData.temporarySelectedCells.forEach((element) => {
       if (!result.includes(element)) {
-        element.target = element.previous
+        element.loadTemporary()
         this.gridData.deleteTemporaryCell(element)
       }
     })
@@ -42,13 +42,11 @@ export default class AssignTool extends DraggableTool {
     super.onDragEnd()
 
     this.gridData.temporarySelectedCells.forEach((element) => {
-      const { x, y } = element.target.position
-      element.target = new AssignedCell(x, y)
+      const { x, y } = element.current.position
+      element.current = new AssignedCell(x, y)
     })
 
-    this.gridData.assignTemporaryCell()
-    this.gridData.initializeTemporaryCell()
-
+    this.gridData.initializeTemporaryCells()
     this.gridData.update()
   }
 
@@ -56,13 +54,13 @@ export default class AssignTool extends DraggableTool {
     super.onDragCancle()
 
     this.gridData.temporarySelectedCells.forEach((element) => {
-      if (this.gridData.assignedCells.includes(element)) {
+      if (element.previous instanceof AssignedCell) {
         return
       }
-      element.target = element.previous
+      element.loadTemporary()
     })
 
-    this.gridData.initializeTemporaryCell()
+    this.gridData.initializeTemporaryCells()
 
     this.gridData.update()
   }

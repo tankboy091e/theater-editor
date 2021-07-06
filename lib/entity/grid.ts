@@ -1,13 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 import { MutableRefObject } from 'react'
 import Canvas from './canvas'
-import Cell from './cell'
+import CellData from './cell/data'
 import DefaultCell from './cell/default'
-
-interface CellData {
-  previous: Cell
-  target: Cell
-}
 
 interface CellList {
   [key: string]: CellData
@@ -27,7 +22,6 @@ export default class Grid extends Canvas {
   public readonly size: number
   public readonly gap: number
   private _temporarySelectedCells: CellList
-  private _assignedCells: CellList
 
   constructor(
     ref: MutableRefObject<HTMLCanvasElement>,
@@ -45,7 +39,6 @@ export default class Grid extends Canvas {
     this.ref.current.height = this.row * (this.size + this.gap) + this.gap
     this.cells = []
     this._temporarySelectedCells = {}
-    this._assignedCells = {}
     this.initializeCells()
     this.update()
   }
@@ -54,9 +47,7 @@ export default class Grid extends Canvas {
     for (let y = this.gap; y < this.height; y += this.size + this.gap) {
       const row = []
       for (let x = this.gap; x < this.width; x += this.size + this.gap) {
-        row.push({
-          target: new DefaultCell(x, y),
-        })
+        row.push(new CellData(new DefaultCell(x, y)))
       }
       this.cells.push(row)
     }
@@ -66,19 +57,8 @@ export default class Grid extends Canvas {
     return Object.values(this._temporarySelectedCells)
   }
 
-  public get assignedCells(): CellData[] {
-    return Object.values(this._assignedCells)
-  }
-
   public selectTemporaryCell(x: number, y: number) : void {
     this._temporarySelectedCells[`${x}-${y}`] = this.cells[x][y]
-  }
-
-  public assignTemporaryCell() : void {
-    this._assignedCells = {
-      ...this._assignedCells,
-      ...this._temporarySelectedCells,
-    }
   }
 
   public deleteTemporaryCell(cellData: CellData) : void {
@@ -88,21 +68,24 @@ export default class Grid extends Canvas {
     delete this._temporarySelectedCells[key]
   }
 
-  public initializeTemporaryCell() : void {
+  public initializeTemporaryCells() : void {
     this._temporarySelectedCells = {}
-  }
-
-  public deleteAssignedCell(cellData: CellData) : void {
-    const [key] = Object.entries(this._assignedCells).find(
-      ([_, element]) => element === cellData,
-    )
-    delete this._assignedCells[key]
   }
 
   public update() : void {
     super.update()
     this.cells.forEach((array) => array.forEach((element) => {
-      element.target.draw(this.context, this.size)
+      element.current.draw(this.context, this.size)
     }))
+  }
+
+  public save() : void {
+    this.cells.forEach((cells) => cells.forEach((cell) => cell.saveMemento()))
+  }
+
+  public undo() : void {
+    this.cells.forEach((cells) => cells.forEach((cell) => cell.loadMemento()))
+
+    this.update()
   }
 }

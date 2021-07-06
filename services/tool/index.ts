@@ -2,6 +2,7 @@ import Grid from 'lib/entity/grid'
 import { Metadata, ToolData, ToolType } from 'lib/entity/tool'
 import { Options } from 'lib/entity/tool/options'
 import Ui from 'lib/entity/ui'
+import KeyboardEventListener from 'services/keyboard'
 
 export default abstract class Tool {
   public readonly name: ToolType
@@ -20,6 +21,8 @@ export default abstract class Tool {
       description: '',
     }
     this._options = {}
+    this.bindEventListeners()
+    this.attachEventListeners()
   }
 
   public get options() {
@@ -31,5 +34,18 @@ export default abstract class Tool {
 
   public setOption(key: string, value: any) : void {
     this._options[key] = value
+  }
+
+  protected undo() : void {
+    this.gridData.undo()
+  }
+
+  private bindEventListeners() {
+    this.undo = this.undo.bind(this)
+  }
+
+  private attachEventListeners() {
+    KeyboardEventListener.instance
+      .on(['Control', 'c'], this.undo)
   }
 }

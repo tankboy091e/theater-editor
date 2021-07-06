@@ -13,29 +13,33 @@ export default class KeyboardEventListener {
   private constructor() {
     this._currentKeys = {}
     this.callbacks = {}
-    this.bindListners()
-    window.addEventListener('keydown', this.onKeyDown)
-    window.addEventListener('keydown', this.onKeyUp)
+    this.bindEventListeners()
+    this.attachEventListeners()
   }
 
   public on(keys : string | string[], func: () => void) : KeyboardEventListener {
-    const key = Array.isArray(keys) ? keys.join('-').trim() : keys
-    this.callbacks[key] = func
+    const key = Array.isArray(keys) ? keys.join('-') : keys
+    this.callbacks[key.toLowerCase()] = func
     return this
   }
 
-  private bindListners() : void {
+  private attachEventListeners() {
+    window.addEventListener('keydown', this.onKeyDown)
+    window.addEventListener('keyup', this.onKeyUp)
+  }
+
+  private bindEventListeners() : void {
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onKeyUp = this.onKeyUp.bind(this)
   }
 
   private onKeyDown(e: KeyboardEvent) : void {
-    this._currentKeys[e.key] = true
+    this._currentKeys[e.key.toLowerCase()] = true
     this.update()
   }
 
   private onKeyUp(e: KeyboardEvent) : void {
-    delete this._currentKeys[e.key]
+    delete this._currentKeys[e.key.toLowerCase()]
   }
 
   private update() : void {

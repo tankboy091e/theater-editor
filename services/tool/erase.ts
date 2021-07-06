@@ -20,17 +20,17 @@ export default class EraseTool extends DraggableTool {
     this.loopRange((i, j) => {
       const cell = this.gridData.cells[i][j]
       result.push(cell)
-      if (cell.target instanceof AssignedCell) {
-        const { x, y } = cell.target.position
-        cell.previous = cell.target
-        cell.target = new ErasedCell(x, y)
+      if (cell.current instanceof AssignedCell) {
+        const { x, y } = cell.current.position
+        cell.saveTemporary()
+        cell.current = new ErasedCell(x, y)
         this.gridData.selectTemporaryCell(i, j)
       }
     })
 
     this.gridData.temporarySelectedCells.forEach((element) => {
       if (!result.includes(element)) {
-        element.target = element.previous
+        element.loadTemporary()
         this.gridData.deleteTemporaryCell(element)
       }
     })
@@ -42,12 +42,11 @@ export default class EraseTool extends DraggableTool {
     super.onDragEnd()
 
     this.gridData.temporarySelectedCells.forEach((element) => {
-      const { x, y } = element.target.position
-      element.target = new DefaultCell(x, y)
-      this.gridData.deleteAssignedCell(element)
+      const { x, y } = element.current.position
+      element.current = new DefaultCell(x, y)
     })
 
-    this.gridData.initializeTemporaryCell()
+    this.gridData.initializeTemporaryCells()
 
     this.gridData.update()
   }
@@ -56,10 +55,10 @@ export default class EraseTool extends DraggableTool {
     super.onDragCancle()
 
     this.gridData.temporarySelectedCells.forEach((element) => {
-      element.target = element.previous
+      element.loadTemporary()
     })
 
-    this.gridData.initializeTemporaryCell()
+    this.gridData.initializeTemporaryCells()
 
     this.gridData.update()
   }
