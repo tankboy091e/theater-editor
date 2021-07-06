@@ -3,7 +3,7 @@ import {
 } from 'react'
 import styles from 'sass/templates/editor.module.scss'
 import { cn } from 'lib/util'
-import Tool, { ToolData, ToolType } from 'services/tool'
+import Tool from 'services/tool'
 import SelectTool from 'services/tool/select'
 import AssignTool from 'services/tool/assign'
 import EraseTool from 'services/tool/erase'
@@ -16,6 +16,7 @@ import { ImSortNumericAsc } from 'react-icons/im'
 import Grid from 'lib/entity/grid'
 import Ui from 'lib/entity/ui'
 import Inspector from 'components/inspector'
+import { ToolData, ToolType } from 'lib/entity/tool'
 
 export default function Editor() {
   const editorDataRef = useRef<ToolData>({

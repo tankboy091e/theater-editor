@@ -6,8 +6,8 @@ import Canvas from './canvas'
 import Grid from './grid'
 
 export default class Ui extends Canvas {
-  private static readonly defaultStrokeStyle = 'rgba(0, 0, 0, 1)'
-  private static readonly defaultFillStyle = 'rgba(0, 0, 0, 0)'
+  private static readonly DEFAULT_STROKE_STYLE = 'rgba(0, 0, 0, 1)'
+  private static readonly DEFAULT_FILL_STYLE = 'rgba(0, 0, 0, 0)'
 
   private _origin: Vector2
   private _position: Vector2
@@ -32,14 +32,14 @@ export default class Ui extends Canvas {
 
   public drawRange(style?: { stroke: string, fill: string}) {
     this.clear()
-    this.context.strokeStyle = style?.stroke || Ui.defaultStrokeStyle
+    this.context.strokeStyle = style?.stroke || Ui.DEFAULT_STROKE_STYLE
     this.context.strokeRect(
       this.origin.x,
       this.origin.y,
       this.position.x - this.origin.x,
       this.position.y - this.origin.y,
     )
-    this.context.fillStyle = style.fill || Ui.defaultFillStyle
+    this.context.fillStyle = style.fill || Ui.DEFAULT_FILL_STYLE
     this.context.fillRect(
       this.origin.x,
       this.origin.y,

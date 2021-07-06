@@ -1,10 +1,12 @@
 import Option from 'lib/entity/tool/options'
 import BooleanOption from 'lib/entity/tool/options/boolean'
 import NumberOption from 'lib/entity/tool/options/number'
-import styles from 'sass/components/inspector.module.scss'
+import SelectOption from 'lib/entity/tool/options/select'
+import styles from 'sass/components/inspector/index.module.scss'
 import Tool from 'services/tool'
 import CheckBox from './checkbox'
 import InputNumber from './input-number'
+import Select from './select'
 
 export default function Inspector({ tool }: { tool: Tool }) {
   if (!tool) {
@@ -22,6 +24,9 @@ export default function Inspector({ tool }: { tool: Tool }) {
     if (option instanceof NumberOption) {
       return <InputNumber option={option} />
     }
+    if (option instanceof SelectOption) {
+      return <Select option={option} />
+    }
     return null
   }
 
@@ -34,8 +39,8 @@ export default function Inspector({ tool }: { tool: Tool }) {
           <h4 className={styles.title}>옵션</h4>
           {options.map(({ key, option }) => (
             <li key={key} className={styles.option}>
-              {getEditable(option)}
               <span className={styles.value}>{key}</span>
+              {getEditable(option)}
             </li>
           ))}
         </ol>

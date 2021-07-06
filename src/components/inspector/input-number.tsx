@@ -1,11 +1,11 @@
-import Option from 'lib/entity/tool/options'
+import NumberOption from 'lib/entity/tool/options/number'
 import { useEffect, useRef } from 'react'
-import styles from 'sass/components/inspector.module.scss'
+import styles from 'sass/components/inspector/option.module.scss'
 
 export default function InputNumber({
   option,
 }: {
-  option: Option
+  option: NumberOption
 }) {
   const ref = useRef<HTMLInputElement>()
 

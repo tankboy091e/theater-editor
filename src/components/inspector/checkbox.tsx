@@ -1,10 +1,10 @@
-import Option from 'lib/entity/tool/options'
+import BooleanOption from 'lib/entity/tool/options/boolean'
 import { useEffect, useRef } from 'react'
 
 export default function CheckBox({
   option,
 }: {
-  option: Option
+  option: BooleanOption
 }) {
   const ref = useRef<HTMLInputElement>()
 
