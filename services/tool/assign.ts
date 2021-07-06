@@ -1,7 +1,7 @@
 import AssignedCell from 'lib/entity/cell/assigned'
 import DefaultCell from 'lib/entity/cell/default'
 import SelectedCell from 'lib/entity/cell/selected'
-import { ToolData } from '.'
+import { ToolData } from 'lib/entity/tool'
 import DraggableTool from './draggable'
 
 export default class AssignTool extends DraggableTool {

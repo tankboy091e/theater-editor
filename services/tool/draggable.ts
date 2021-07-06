@@ -1,5 +1,6 @@
 import { IDraggable } from 'lib/entity'
-import Tool, { ToolData, ToolType } from '.'
+import { ToolData, ToolType } from 'lib/entity/tool'
+import Tool from '.'
 
 export default abstract class DraggableTool extends Tool implements IDraggable {
   protected stokeStyle = 'rgba(0, 90, 244, .7)'
@@ -32,7 +33,7 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     this.onDragFinish()
   }
 
-  public onDragFinish() : void {
+  private onDragFinish() : void {
     this.detachListeners()
     this.uiData.clear()
   }

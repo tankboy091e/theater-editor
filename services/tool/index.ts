@@ -1,21 +1,7 @@
 import Grid from 'lib/entity/grid'
+import { Metadata, ToolData, ToolType } from 'lib/entity/tool'
+import { Options } from 'lib/entity/tool/options'
 import Ui from 'lib/entity/ui'
-
-export type ToolType = 'select' | 'assign' | 'erase' | 'indexer'
-
-export interface ToolData {
-  gridData: Grid
-  uiData: Ui
-}
-
-interface Options {
-  [property: string] : any
-}
-
-interface Metadata {
-  name: string
-  description: string
-}
 
 export default abstract class Tool {
   public readonly name: ToolType
@@ -37,12 +23,10 @@ export default abstract class Tool {
   }
 
   public get options() {
-    return Object.entries(this._options).map(([key, value]) => (
-      {
-        key,
-        value,
-      }
-    ))
+    return Object.entries(this._options).map(([key, option]) => ({
+      key,
+      option,
+    }))
   }
 
   public setOption(key: string, value: any) {

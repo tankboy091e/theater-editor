@@ -1,3 +1,6 @@
+import Option from 'lib/entity/tool/options'
+import BooleanOption from 'lib/entity/tool/options/boolean'
+import NumberOption from 'lib/entity/tool/options/number'
 import styles from 'sass/components/inspector.module.scss'
 import Tool from 'services/tool'
 import CheckBox from './checkbox'
@@ -12,15 +15,14 @@ export default function Inspector({ tool }: { tool: Tool }) {
 
   const { name, description } = tool.metadata
 
-  const getEditable = (key: string, value: any) => {
-    switch (typeof value) {
-      case 'boolean':
-        return <CheckBox tool={tool} head={key} value={value} />
-      case 'number':
-        return <InputNumber tool={tool} head={key} value={value} />
-      default:
-        return null
+  const getEditable = (option: Option) => {
+    if (option instanceof BooleanOption) {
+      return <CheckBox option={option} />
     }
+    if (option instanceof NumberOption) {
+      return <InputNumber option={option} />
+    }
+    return null
   }
 
   return (
@@ -30,9 +32,9 @@ export default function Inspector({ tool }: { tool: Tool }) {
       {options?.length > 0 && (
         <ol className={styles.options}>
           <h4 className={styles.title}>옵션</h4>
-          {options.map(({ key, value }) => (
+          {options.map(({ key, option }) => (
             <li key={key} className={styles.option}>
-              {getEditable(key, value)}
+              {getEditable(option)}
               <span className={styles.value}>{key}</span>
             </li>
           ))}

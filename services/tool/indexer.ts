@@ -1,7 +1,9 @@
 import AssignedCell from 'lib/entity/cell/assigned'
 import IndexAssigendCell from 'lib/entity/cell/assigned/indexer'
 import IndexSelectedCell from 'lib/entity/cell/selected/indexer'
-import { ToolData } from '.'
+import BooleanOption from 'lib/entity/tool/options/boolean'
+import NumberOption from 'lib/entity/tool/options/number'
+import { ToolData } from 'lib/entity/tool'
 import DraggableTool from './draggable'
 
 export default class IndexerTool extends DraggableTool {
@@ -13,9 +15,9 @@ export default class IndexerTool extends DraggableTool {
     super('indexer', data)
     this.metadata.name = '색인'
     this.metadata.description = '좌석에 번호를 매깁니다.'
-    this._options[IndexerTool.startNumberInitialize] = 1
-    this._options[IndexerTool.linebreakingInitialize] = false
-    this._options[IndexerTool.passageInitialize] = false
+    this._options[IndexerTool.startNumberInitialize] = new NumberOption(1)
+    this._options[IndexerTool.linebreakingInitialize] = new BooleanOption(false)
+    this._options[IndexerTool.passageInitialize] = new BooleanOption(false)
   }
 
   public onDrag(e: MouseEvent) {
@@ -46,7 +48,7 @@ export default class IndexerTool extends DraggableTool {
   public onDragEnd(): void {
     super.onDragEnd()
 
-    const start = this._options[IndexerTool.startNumberInitialize]
+    const start = this._options[IndexerTool.startNumberInitialize].value
 
     let index = start
 
@@ -68,13 +70,13 @@ export default class IndexerTool extends DraggableTool {
       .forEach((element) => {
         const { x, y } = element.target.position
 
-        if (this._options[IndexerTool.linebreakingInitialize]) {
+        if (this._options[IndexerTool.linebreakingInitialize].value) {
           if (previous.y !== y) {
             index = start
           }
         }
 
-        if (this._options[IndexerTool.passageInitialize]) {
+        if (this._options[IndexerTool.passageInitialize].value) {
           if (previous.y === y && previous.x !== x - (this.gridData.size + this.gridData.gap)) {
             index = start
           }

@@ -1,20 +1,16 @@
+import Option from 'lib/entity/tool/options'
 import { useEffect, useRef } from 'react'
 import styles from 'sass/components/inspector.module.scss'
-import Tool from 'services/tool'
 
 export default function InputNumber({
-  tool,
-  head,
-  value,
+  option,
 }: {
-  tool: Tool
-  head: string
-  value: number
+  option: Option
 }) {
   const ref = useRef<HTMLInputElement>()
 
   useEffect(() => {
-    ref.current.value = value.toString()
+    ref.current.value = option.value.toString()
   }, [])
 
   return (
@@ -23,7 +19,7 @@ export default function InputNumber({
       ref={ref}
       className={styles.inputNumber}
       onChange={(e) => {
-        tool.setOption(head, parseInt(e.target.value, 10))
+        option.setValue(parseInt(e.target.value, 10))
       }}
     />
   )
