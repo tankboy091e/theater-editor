@@ -6,12 +6,12 @@
     border: 1px solid rgba(black, .2);
     padding: 0 .25rem;
     font-size: .9rem;
+    background-color: white;
 }
 
 .select {
     color: rgba(black, .7);
     border: 1px solid rgba(black, .2);
-
     &:focus {
         outline: none;
     }

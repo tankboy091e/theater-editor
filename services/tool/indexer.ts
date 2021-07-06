@@ -8,21 +8,29 @@ import SelectOption from 'lib/entity/tool/options/select'
 import DraggableTool from './draggable'
 
 export default class IndexerTool extends DraggableTool {
-  protected static HORIZONTAL_DIRECTION = '수평 색인'
-  protected static VERTICAL_DIRECTION = '수직 색인'
-  protected static START_NUMBER = '시작 번호'
-  protected static LINE_BREAKING_INITIALIZE = '줄바꿈 시 처음부터 시작'
-  protected static PASSAGE_INITIALIZE = '통로를 지나면 처음부터 시작'
+  protected static readonly START_NUMBER = '시작 번호'
+  protected static readonly INDEX_DIRECTION = '색인 방향'
+  protected static readonly HORIZONTAL_DIRECTION = '수평 색인'
+  protected static readonly VERTICAL_DIRECTION = '수직 색인'
+  protected static readonly LINE_BREAKING_INITIALIZE = '줄바꿈 시 처음부터 시작'
+  protected static readonly PASSAGE_INITIALIZE = '자리를 건너뛰면 처음부터 시작'
 
-  private static HONRIZONTAL_LEFT_TO_RIGHT = '왼쪽에서 오른쪽으로'
-  private static HONRIZONTAL_RIGHT_TO_LEFT = '오른쪽에서 왼쪽으로'
-  private static VERTICAL_UP_TO_DOWN = '위쪽에서 아래쪽으로'
-  private static VERTICAL_DOWN_TO_UP = '아래쪽에서 위쪽으로'
+  private static readonly INDEX_HORIZONTAL = '가로'
+  private static readonly INDEX_VERTICAL = '세로'
+  private static readonly HONRIZONTAL_LEFT_TO_RIGHT = '왼쪽에서 오른쪽으로'
+  private static readonly HONRIZONTAL_RIGHT_TO_LEFT = '오른쪽에서 왼쪽으로'
+  private static readonly VERTICAL_UP_TO_DOWN = '위쪽에서 아래쪽으로'
+  private static readonly VERTICAL_DOWN_TO_UP = '아래쪽에서 위쪽으로'
 
   constructor(data: ToolData) {
     super('indexer', data)
     this.metadata.name = '색인'
     this.metadata.description = '좌석에 번호를 매깁니다.'
+    this._options[IndexerTool.START_NUMBER] = new NumberOption(1)
+    this._options[IndexerTool.INDEX_DIRECTION] = new SelectOption([
+      IndexerTool.INDEX_HORIZONTAL,
+      IndexerTool.INDEX_VERTICAL,
+    ])
     this._options[IndexerTool.HORIZONTAL_DIRECTION] = new SelectOption([
       IndexerTool.HONRIZONTAL_LEFT_TO_RIGHT,
       IndexerTool.HONRIZONTAL_RIGHT_TO_LEFT,
@@ -31,14 +39,13 @@ export default class IndexerTool extends DraggableTool {
       IndexerTool.VERTICAL_UP_TO_DOWN,
       IndexerTool.VERTICAL_DOWN_TO_UP,
     ])
-    this._options[IndexerTool.START_NUMBER] = new NumberOption(1)
     this._options[IndexerTool.LINE_BREAKING_INITIALIZE] = new BooleanOption(
       false,
     )
     this._options[IndexerTool.PASSAGE_INITIALIZE] = new BooleanOption(false)
   }
 
-  public onDrag(e: MouseEvent) : void {
+  public onDrag(e: MouseEvent): void {
     super.onDrag(e)
 
     const result = []
@@ -79,11 +86,7 @@ export default class IndexerTool extends DraggableTool {
       .sort((a, b) => {
         const { x: aX, y: aY } = a.current.position
         const { x: bX, y: bY } = b.current.position
-        const result = this.verticalIndexer(aY, bY)
-        if (result !== 0) {
-          return result
-        }
-        return this.horizontalIndexer(aX, bX)
+        return this.arrange(aX, bX, aY, bY)
       })
       .forEach((element) => {
         const { x, y } = element.current.position
@@ -124,7 +127,31 @@ export default class IndexerTool extends DraggableTool {
     this.gridData.update()
   }
 
-  private horizontalIndexer(a: any, b: any) : number {
+  private arrange(aX: any, bX: any, aY: any, bY: any): number {
+    if (
+      this._options[IndexerTool.INDEX_DIRECTION].value
+      === IndexerTool.INDEX_HORIZONTAL
+    ) {
+      const result = this.arrangeVertical(aY, bY)
+      if (result !== 0) {
+        return result
+      }
+      return this.arrangeHorizontal(aX, bX)
+    }
+    if (
+      this._options[IndexerTool.INDEX_DIRECTION].value
+      === IndexerTool.INDEX_VERTICAL
+    ) {
+      const result = this.arrangeHorizontal(aX, bX)
+      if (result !== 0) {
+        return result
+      }
+      return this.arrangeVertical(aY, bY)
+    }
+    return 0
+  }
+
+  private arrangeHorizontal(a: any, b: any): number {
     if (
       this._options[IndexerTool.HORIZONTAL_DIRECTION].value
       === IndexerTool.HONRIZONTAL_LEFT_TO_RIGHT
@@ -142,7 +169,7 @@ export default class IndexerTool extends DraggableTool {
     return 0
   }
 
-  private verticalIndexer(a: any, b: any) : number {
+  private arrangeVertical(a: any, b: any): number {
     if (
       this._options[IndexerTool.VERTICAL_DIRECTION].value
       === IndexerTool.VERTICAL_UP_TO_DOWN
