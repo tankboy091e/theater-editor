@@ -22,9 +22,9 @@ export default class AssignTool extends DraggableTool {
 
       if (cell.current instanceof DefaultCell) {
         this.gridData.selectTemporaryCell(i, j)
-        const { x, y } = cell.current.position
+        const { props } = cell.current
         cell.saveTemporary()
-        cell.current = new SelectedCell(x, y)
+        cell.current = new SelectedCell(props)
       }
     })
 
@@ -41,13 +41,18 @@ export default class AssignTool extends DraggableTool {
   public onDragEnd(): void {
     super.onDragEnd()
 
+    if (this.gridData.temporarySelectedCells.length === 0) {
+      return
+    }
+
     this.gridData.temporarySelectedCells.forEach((element) => {
-      const { x, y } = element.current.position
-      element.current = new AssignedCell(x, y)
+      const { props } = element.current
+      element.current = new AssignedCell(props)
     })
 
     this.gridData.initializeTemporaryCells()
     this.gridData.update()
+    this.gridData.save()
   }
 
   public onDragCancle(): void {

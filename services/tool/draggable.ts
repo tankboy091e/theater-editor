@@ -29,7 +29,6 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
   }
 
   public onDragEnd(): void {
-    this.gridData.save()
     this.onDragFinish()
   }
 

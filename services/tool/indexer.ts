@@ -1,10 +1,11 @@
 import AssignedCell from 'lib/entity/cell/assigned'
-import IndexAssigendCell from 'lib/entity/cell/assigned/indexer'
 import IndexSelectedCell from 'lib/entity/cell/selected/indexer'
 import BooleanOption from 'lib/entity/tool/options/boolean'
 import NumberOption from 'lib/entity/tool/options/number'
 import { ToolData } from 'lib/entity/tool'
 import SelectOption from 'lib/entity/tool/options/select'
+import CellData from 'lib/entity/cell/data'
+import { Direction } from 'lib/entity/cell'
 import DraggableTool from './draggable'
 
 export default class IndexerTool extends DraggableTool {
@@ -14,6 +15,7 @@ export default class IndexerTool extends DraggableTool {
   protected static readonly VERTICAL_DIRECTION = '수직 색인'
   protected static readonly LINE_BREAKING_INITIALIZE = '줄바꿈 시 처음부터 시작'
   protected static readonly PASSAGE_INITIALIZE = '자리를 건너뛰면 처음부터 시작'
+  protected static readonly AUTO_INDEXED_COLUMN = '자동으로 열 태그 입력'
 
   private static readonly INDEX_HORIZONTAL = '가로'
   private static readonly INDEX_VERTICAL = '세로'
@@ -39,10 +41,11 @@ export default class IndexerTool extends DraggableTool {
       IndexerTool.VERTICAL_UP_TO_DOWN,
       IndexerTool.VERTICAL_DOWN_TO_UP,
     ])
-    this._options[IndexerTool.LINE_BREAKING_INITIALIZE] = new BooleanOption(
-      false,
-    )
+    this._options[IndexerTool.AUTO_INDEXED_COLUMN] = new BooleanOption(false)
+    this._options[IndexerTool.LINE_BREAKING_INITIALIZE] = new BooleanOption(false)
     this._options[IndexerTool.PASSAGE_INITIALIZE] = new BooleanOption(false)
+
+    this.arrange = this.arrange.bind(this)
   }
 
   public onDrag(e: MouseEvent): void {
@@ -53,9 +56,9 @@ export default class IndexerTool extends DraggableTool {
       const cell = this.gridData.cells[i][j]
       result.push(cell)
       if (cell.current instanceof AssignedCell) {
-        const { x, y } = cell.current.position
+        const { props } = cell.current
         cell.saveTemporary()
-        cell.current = new IndexSelectedCell(x, y)
+        cell.current = new IndexSelectedCell(props)
         this.gridData.selectTemporaryCell(i, j)
       }
     })
@@ -73,9 +76,14 @@ export default class IndexerTool extends DraggableTool {
   public onDragEnd(): void {
     super.onDragEnd()
 
+    if (this.gridData.temporarySelectedCells.length === 0) {
+      return
+    }
+
     const start = this._options[IndexerTool.START_NUMBER].value
 
     let index = start
+    let column = 0
 
     const previous = {
       x: undefined,
@@ -83,27 +91,89 @@ export default class IndexerTool extends DraggableTool {
     }
 
     this.gridData.temporarySelectedCells
-      .sort((a, b) => {
-        const { x: aX, y: aY } = a.current.position
-        const { x: bX, y: bY } = b.current.position
-        return this.arrange(aX, bX, aY, bY)
-      })
+      .sort(this.arrange)
       .forEach((element) => {
-        const { x, y } = element.current.position
+        if (!(element.previous instanceof AssignedCell)) {
+          return
+        }
+        const { tags, position } = element.previous
+        const { x, y } = position
+
+        const newOne : {
+          x: number
+          y: number
+          index?: number
+          direction?: Direction
+          tags?: string[]
+        } = {
+          x, y, tags,
+        }
+
+        newOne.direction = this.getDirection()
+
+        if (this._options[IndexerTool.AUTO_INDEXED_COLUMN].value) {
+          if (newOne.direction === 'horizontal') {
+            if (previous.y !== y) {
+              column += 1
+            }
+          }
+          if (newOne.direction === 'vertical') {
+            if (previous.x !== x) {
+              column += 1
+            }
+          }
+          newOne.tags.push(`${column}열`)
+        } else {
+          newOne.tags = newOne.tags.filter((tag) => !tag.includes('열'))
+        }
 
         if (this._options[IndexerTool.LINE_BREAKING_INITIALIZE].value) {
-          if (previous.y !== y) {
-            index = start
+          if (newOne.direction === 'horizontal') {
+            if (previous.y !== y) {
+              index = start
+            }
+          }
+          if (newOne.direction === 'vertical') {
+            if (previous.x !== x) {
+              index = start
+            }
           }
         }
 
         if (this._options[IndexerTool.PASSAGE_INITIALIZE].value) {
-          if (previous.x !== x - (this.gridData.size + this.gridData.gap)) {
-            index = start
+          if (newOne.direction === 'horizontal') {
+            if (this._options[IndexerTool.HORIZONTAL_DIRECTION].value
+                === IndexerTool.HONRIZONTAL_LEFT_TO_RIGHT) {
+              if (previous.x !== x - (this.gridData.size + this.gridData.gap)) {
+                index = start
+              }
+            }
+            if (this._options[IndexerTool.HORIZONTAL_DIRECTION].value
+              === IndexerTool.HONRIZONTAL_RIGHT_TO_LEFT) {
+              if (previous.x !== x + (this.gridData.size + this.gridData.gap)) {
+                index = start
+              }
+            }
+          }
+          if (newOne.direction === 'vertical') {
+            if (this._options[IndexerTool.VERTICAL_DIRECTION].value
+              === IndexerTool.VERTICAL_UP_TO_DOWN) {
+              if (previous.y !== y - (this.gridData.size + this.gridData.gap)) {
+                index = start
+              }
+            }
+            if (this._options[IndexerTool.VERTICAL_DIRECTION].value
+              === IndexerTool.VERTICAL_DOWN_TO_UP) {
+              if (previous.y !== y + (this.gridData.size + this.gridData.gap)) {
+                index = start
+              }
+            }
           }
         }
 
-        element.current = new IndexAssigendCell(x, y, index)
+        newOne.index = index
+
+        element.current = new AssignedCell(newOne)
 
         previous.x = x
         previous.y = y
@@ -112,8 +182,8 @@ export default class IndexerTool extends DraggableTool {
       })
 
     this.gridData.initializeTemporaryCells()
-
     this.gridData.update()
+    this.gridData.save()
   }
 
   public onDragCancle(): void {
@@ -127,7 +197,9 @@ export default class IndexerTool extends DraggableTool {
     this.gridData.update()
   }
 
-  private arrange(aX: any, bX: any, aY: any, bY: any): number {
+  private arrange(a : CellData, b : CellData): number {
+    const { x: aX, y: aY } = a.current.position
+    const { x: bX, y: bY } = b.current.position
     if (
       this._options[IndexerTool.INDEX_DIRECTION].value
       === IndexerTool.INDEX_HORIZONTAL
@@ -152,16 +224,36 @@ export default class IndexerTool extends DraggableTool {
   }
 
   private arrangeHorizontal(a: any, b: any): number {
+    return this.arrangeBy(
+      a,
+      b,
+      IndexerTool.HORIZONTAL_DIRECTION,
+      IndexerTool.HONRIZONTAL_LEFT_TO_RIGHT,
+      IndexerTool.HONRIZONTAL_RIGHT_TO_LEFT,
+    )
+  }
+
+  private arrangeVertical(a: any, b: any): number {
+    return this.arrangeBy(
+      a,
+      b,
+      IndexerTool.VERTICAL_DIRECTION,
+      IndexerTool.VERTICAL_UP_TO_DOWN,
+      IndexerTool.VERTICAL_DOWN_TO_UP,
+    )
+  }
+
+  private arrangeBy(a : any, b : any, option: string, option1: string, option2: string) {
     if (
-      this._options[IndexerTool.HORIZONTAL_DIRECTION].value
-      === IndexerTool.HONRIZONTAL_LEFT_TO_RIGHT
+      this._options[option].value
+      === option1
     ) {
       if (a > b) return 1
       if (a < b) return -1
     }
     if (
-      this._options[IndexerTool.HORIZONTAL_DIRECTION].value
-      === IndexerTool.HONRIZONTAL_RIGHT_TO_LEFT
+      this._options[option].value
+      === option2
     ) {
       if (a > b) return -1
       if (a < b) return 1
@@ -169,21 +261,13 @@ export default class IndexerTool extends DraggableTool {
     return 0
   }
 
-  private arrangeVertical(a: any, b: any): number {
-    if (
-      this._options[IndexerTool.VERTICAL_DIRECTION].value
-      === IndexerTool.VERTICAL_UP_TO_DOWN
-    ) {
-      if (a > b) return 1
-      if (a < b) return -1
+  private getDirection() : Direction {
+    if (this._options[IndexerTool.INDEX_DIRECTION].value === IndexerTool.INDEX_HORIZONTAL) {
+      return 'horizontal'
     }
-    if (
-      this._options[IndexerTool.VERTICAL_DIRECTION].value
-      === IndexerTool.VERTICAL_DOWN_TO_UP
-    ) {
-      if (a > b) return -1
-      if (a < b) return 1
+    if (this._options[IndexerTool.INDEX_DIRECTION].value === IndexerTool.INDEX_VERTICAL) {
+      return 'vertical'
     }
-    return 0
+    return null
   }
 }

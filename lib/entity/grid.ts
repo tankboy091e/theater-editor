@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { MutableRefObject } from 'react'
 import Canvas from './canvas'
+import AssignedCell from './cell/assigned'
 import CellData from './cell/data'
 import DefaultCell from './cell/default'
 
@@ -47,7 +48,7 @@ export default class Grid extends Canvas {
     for (let y = this.gap; y < this.height; y += this.size + this.gap) {
       const row = []
       for (let x = this.gap; x < this.width; x += this.size + this.gap) {
-        row.push(new CellData(new DefaultCell(x, y)))
+        row.push(new CellData(new DefaultCell({ x, y })))
       }
       this.cells.push(row)
     }
@@ -74,8 +75,36 @@ export default class Grid extends Canvas {
 
   public update() : void {
     super.update()
-    this.cells.forEach((array) => array.forEach((element) => {
+    this.cells.forEach((rows, columnIndex, columns) => rows.forEach((element, index, array) => {
       element.current.draw(this.context, this.size)
+      if (element.current instanceof AssignedCell) {
+        if (!element.current.column) {
+          return
+        }
+        const { direction } = element.current
+        if (direction === 'horizontal') {
+          if (index > 1) {
+            const prev = array[index - 1]
+            if (prev.current instanceof AssignedCell) {
+              if (element.current.column === prev.current.column) {
+                return
+              }
+            }
+          }
+          element.current.indicateColumn(this.context, this.size, direction)
+        }
+        if (direction === 'vertical') {
+          if (columnIndex > 1) {
+            const prev = columns[columnIndex - 1][index]
+            if (prev.current instanceof AssignedCell) {
+              if (element.current.column === prev.current.column) {
+                return
+              }
+            }
+          }
+          element.current.indicateColumn(this.context, this.size, direction)
+        }
+      }
     }))
   }
 

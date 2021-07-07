@@ -1,24 +1,24 @@
-import NumberOption from 'lib/entity/tool/options/number'
+import TextOption from 'lib/entity/tool/options/text'
 import { useEffect, useRef } from 'react'
 import styles from 'sass/components/inspector/option.module.scss'
 
-export default function InputNumber({
+export default function InputText({
   option,
 }: {
-  option: NumberOption
+  option: TextOption
 }) {
   const ref = useRef<HTMLInputElement>()
 
   useEffect(() => {
-    ref.current.value = option.value.toString()
+    ref.current.value = option.value
   }, [])
 
   return (
     <input
-      type="number"
+      type="text"
       ref={ref}
       className={styles.inputNumber}
-      onChange={(e) => option.setValue(parseInt(e.target.value, 10))}
+      onChange={(e) => option.setValue(e.target.value)}
     />
   )
 }

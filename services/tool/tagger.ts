@@ -1,19 +1,23 @@
 import AssignedCell from 'lib/entity/cell/assigned'
-import DefaultCell from 'lib/entity/cell/default'
-import ErasedCell from 'lib/entity/cell/erased'
+import TagSelectedCell from 'lib/entity/cell/selected/tag'
 import { ToolData } from 'lib/entity/tool'
+import TextOption from 'lib/entity/tool/options/text'
 import DraggableTool from './draggable'
 
-export default class EraseTool extends DraggableTool {
+export default class TaggerTool extends DraggableTool {
+  protected static readonly TAG_NAME = '태그 이름'
+
   constructor(data: ToolData) {
-    super('erase', data)
-    this.metadata.name = '지우개'
-    this.metadata.description = '할당된 좌석을 지웁니다.'
-    this.stokeStyle = 'rgba(196, 37, 64, .7)'
-    this.fillStyle = 'rgba(196, 37, 64, .3)'
+    super('tagger', data)
+    this.metadata.name = '태그'
+    this.metadata.description = '좌석에 태그를 붙입니다.'
+    this.stokeStyle = 'rgba(245, 234, 60, .7)'
+    this.fillStyle = 'rgba(245, 234, 60, .3)'
+
+    this._options[TaggerTool.TAG_NAME] = new TextOption('')
   }
 
-  public onDrag(e: MouseEvent) : void {
+  public onDrag(e: MouseEvent): void {
     super.onDrag(e)
 
     const result = []
@@ -21,9 +25,8 @@ export default class EraseTool extends DraggableTool {
       const cell = this.gridData.cells[i][j]
       result.push(cell)
       if (cell.current instanceof AssignedCell) {
-        const { props } = cell.current
         cell.saveTemporary()
-        cell.current = new ErasedCell(props)
+        cell.current = new TagSelectedCell(cell.current)
         this.gridData.selectTemporaryCell(i, j)
       }
     })
@@ -45,10 +48,18 @@ export default class EraseTool extends DraggableTool {
       return
     }
 
-    this.gridData.temporarySelectedCells.forEach((element) => {
-      const { props } = element.current
-      element.current = new DefaultCell(props)
-    })
+    const tag = this._options[TaggerTool.TAG_NAME].value
+
+    this.gridData.temporarySelectedCells
+      .forEach((element) => {
+        if (!(element.previous instanceof AssignedCell)) {
+          return
+        }
+        const { tags, props, index } = element.previous
+        element.current = new AssignedCell({
+          ...props, index, tags: [...tags, tag],
+        })
+      })
 
     this.gridData.initializeTemporaryCells()
     this.gridData.update()
@@ -63,7 +74,6 @@ export default class EraseTool extends DraggableTool {
     })
 
     this.gridData.initializeTemporaryCells()
-
     this.gridData.update()
   }
 }

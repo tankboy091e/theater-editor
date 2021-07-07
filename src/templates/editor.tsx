@@ -13,11 +13,13 @@ import DraggableTool from 'services/tool/draggable'
 import { RiEraserLine, RiCursorLine } from 'react-icons/ri'
 import { BiSelection } from 'react-icons/bi'
 import { ImSortNumericAsc } from 'react-icons/im'
+import { FiTag } from 'react-icons/fi'
 import Grid from 'lib/entity/grid'
 import Ui from 'lib/entity/ui'
 import Inspector from 'components/inspector'
 import { ToolData, ToolType } from 'lib/entity/tool'
 import KeyboardEventListener from 'services/keyboard'
+import TaggerTool from 'services/tool/tagger'
 
 export default function Editor() {
   const editorDataRef = useRef<ToolData>({
@@ -48,6 +50,9 @@ export default function Editor() {
         break
       case 'indexer':
         setTool(new IndexerTool(editorData))
+        break
+      case 'tagger':
+        setTool(new TaggerTool(editorData))
         break
       default:
         break
@@ -89,6 +94,7 @@ export default function Editor() {
       .on('a', () => changeTool('assign'))
       .on('e', () => changeTool('erase'))
       .on('i', () => changeTool('indexer'))
+      .on('t', () => changeTool('tagger'))
   }
 
   useResize(setCenter)
@@ -148,5 +154,9 @@ const tools: {
   {
     name: 'indexer',
     icon: <ImSortNumericAsc size={20} />,
+  },
+  {
+    name: 'tagger',
+    icon: <FiTag size={22} />,
   },
 ]

@@ -16,9 +16,7 @@ export default function CheckBox({
     <input
       type="checkbox"
       ref={ref}
-      onClick={(e) => {
-        option.setValue(e.currentTarget.checked)
-      }}
+      onClick={(e) => option.setValue(e.currentTarget.checked)}
     />
   )
 }

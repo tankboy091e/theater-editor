@@ -13,9 +13,7 @@ export default function Select({ option }: { option: SelectOption }) {
     <select
       ref={ref}
       className={styles.select}
-      onChange={(e) => {
-        option.setValue(e.target.value)
-      }}
+      onChange={(e) => option.setValue(e.target.value)}
     >
       {option.values.map((value) => (
         <option key={value} value={value}>{value}</option>
