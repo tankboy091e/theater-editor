@@ -22,7 +22,7 @@ $padding: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
-
+    color: rgba(colors.$primary, .7);
     &:hover:not(.active) {
         background-color: rgba(colors.$accent, .08);
     }
@@ -37,13 +37,17 @@ $padding: 4px;
     }
 }
 
+.body {
+    flex: 1;
+    position: relative;
+    display: flex;
+    overflow: hidden;
+}
+
 .main {
     position: relative;
-    width: 100vw;
     flex: 1;
-    overflow-x: scroll;
-    overflow-y: scroll;
-
+    overflow: scroll;
     @include util.scroll-bar();
 }
 

@@ -1,0 +1,43 @@
+@use '../../lib/colors.scss' as colors;
+
+.container {
+    padding: 1rem;
+    width: 300px;
+    color: rgba(colors.$primary, .8);
+    border-right: 1px solid rgba(black, .3);
+}
+
+.description {
+    margin-top: .25rem;
+}
+
+.options {
+    border-top: 1px solid rgba(black, .2);
+    margin-top: 1rem;
+    list-style: none;
+    padding: 1rem 0;
+}
+
+.option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    & + & {
+        margin-top: .25rem;
+    }
+}
+
+.inputNumber {
+    font-size: .9rem;
+    width: 20%;
+    border: 1px solid rgba(black, .2);
+    text-align: center;
+}
+
+.title {
+    margin-bottom: .5rem;
+}
+
+.value {
+    margin-right: .5rem;
+}

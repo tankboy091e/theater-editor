@@ -14,7 +14,7 @@ body {
 }
 
 body {
-  font-family: 'Lato', serif;
+  font-family: 'Lato', sans-serif;
   position: relative;
   color: colors.$primary;
   background-color: colors.$background;
@@ -82,10 +82,4 @@ input, textarea {
 
 input[type=submit] {
   cursor: pointer;
-}
-
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
 }
