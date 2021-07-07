@@ -46,6 +46,6 @@ export default abstract class Tool {
 
   private attachEventListeners() {
     KeyboardEventListener.instance
-      .on(['Control', 'c'], this.undo)
+      .on(['Control', 'z'], this.undo)
   }
 }
