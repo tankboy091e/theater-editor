@@ -40,7 +40,7 @@ export default abstract class Tool {
     this.gridData.undo()
   }
 
-  private bindEventListeners() {
+  protected bindEventListeners() {
     this.undo = this.undo.bind(this)
   }
 

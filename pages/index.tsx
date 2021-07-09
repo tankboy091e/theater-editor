@@ -1,10 +1,13 @@
+import Footer from 'components/footer'
 import Layout from 'layouts/default'
-import Editor from 'templates/editor'
+import Landing from 'templates/landing'
 
 export default function Page() {
   return (
-    <Layout>
-      <Editor />
+    <Layout
+      footer={<Footer />}
+    >
+      <Landing />
     </Layout>
   )
 }

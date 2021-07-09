@@ -28,24 +28,7 @@ export default class IndexerTool extends DraggableTool {
     super('indexer', data)
     this.metadata.name = '색인'
     this.metadata.description = '좌석에 번호를 매깁니다.'
-    this._options[IndexerTool.START_NUMBER] = new NumberOption(1)
-    this._options[IndexerTool.INDEX_DIRECTION] = new SelectOption([
-      IndexerTool.INDEX_HORIZONTAL,
-      IndexerTool.INDEX_VERTICAL,
-    ])
-    this._options[IndexerTool.HORIZONTAL_DIRECTION] = new SelectOption([
-      IndexerTool.HONRIZONTAL_LEFT_TO_RIGHT,
-      IndexerTool.HONRIZONTAL_RIGHT_TO_LEFT,
-    ])
-    this._options[IndexerTool.VERTICAL_DIRECTION] = new SelectOption([
-      IndexerTool.VERTICAL_UP_TO_DOWN,
-      IndexerTool.VERTICAL_DOWN_TO_UP,
-    ])
-    this._options[IndexerTool.AUTO_INDEXED_COLUMN] = new BooleanOption(false)
-    this._options[IndexerTool.LINE_BREAKING_INITIALIZE] = new BooleanOption(false)
-    this._options[IndexerTool.PASSAGE_INITIALIZE] = new BooleanOption(false)
-
-    this.arrange = this.arrange.bind(this)
+    this.initializeOptions()
   }
 
   public onDrag(e: MouseEvent): void {
@@ -269,5 +252,29 @@ export default class IndexerTool extends DraggableTool {
       return 'vertical'
     }
     return null
+  }
+
+  private initializeOptions() {
+    this._options[IndexerTool.START_NUMBER] = new NumberOption(1)
+    this._options[IndexerTool.INDEX_DIRECTION] = new SelectOption([
+      IndexerTool.INDEX_HORIZONTAL,
+      IndexerTool.INDEX_VERTICAL,
+    ])
+    this._options[IndexerTool.HORIZONTAL_DIRECTION] = new SelectOption([
+      IndexerTool.HONRIZONTAL_LEFT_TO_RIGHT,
+      IndexerTool.HONRIZONTAL_RIGHT_TO_LEFT,
+    ])
+    this._options[IndexerTool.VERTICAL_DIRECTION] = new SelectOption([
+      IndexerTool.VERTICAL_UP_TO_DOWN,
+      IndexerTool.VERTICAL_DOWN_TO_UP,
+    ])
+    this._options[IndexerTool.AUTO_INDEXED_COLUMN] = new BooleanOption(false)
+    this._options[IndexerTool.LINE_BREAKING_INITIALIZE] = new BooleanOption(false)
+    this._options[IndexerTool.PASSAGE_INITIALIZE] = new BooleanOption(false)
+  }
+
+  protected bindEventListeners() {
+    super.bindEventListeners()
+    this.arrange = this.arrange.bind(this)
   }
 }

@@ -11,15 +11,15 @@ interface CellList {
 
 interface Props {
   size: number
-  column: number
-  row: number
+  columns: number
+  rows: number
   gap: number
 }
 
 export default class Grid extends Canvas {
   public readonly cells: CellData[][]
-  public readonly column: number
-  public readonly row: number
+  public readonly columns: number
+  public readonly rows: number
   public readonly size: number
   public readonly gap: number
   private _temporarySelectedCells: CellList
@@ -28,16 +28,16 @@ export default class Grid extends Canvas {
     ref: MutableRefObject<HTMLCanvasElement>,
     containerRef: MutableRefObject<HTMLElement>,
     {
-      size, column, row, gap,
+      size, columns: column, rows: row, gap,
     }: Props,
   ) {
     super(ref, containerRef)
     this.size = size
-    this.column = column
-    this.row = row
+    this.columns = column
+    this.rows = row
     this.gap = gap
-    this.ref.current.width = this.column * (this.size + this.gap) + this.gap
-    this.ref.current.height = this.row * (this.size + this.gap) + this.gap
+    this.ref.current.width = this.columns * (this.size + this.gap) + this.gap
+    this.ref.current.height = this.rows * (this.size + this.gap) + this.gap
     this.cells = []
     this._temporarySelectedCells = {}
     this.initializeCells()

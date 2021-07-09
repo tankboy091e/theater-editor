@@ -20,6 +20,8 @@ import Inspector from 'components/inspector'
 import { ToolData, ToolType } from 'lib/entity/tool'
 import KeyboardEventListener from 'services/keyboard'
 import TaggerTool from 'services/tool/tagger'
+import { deleteCookie, getCookie } from 'lib/util/cookie'
+import { G_COLUMNS, G_ROWS, G_SIZE } from './landing'
 
 export default function Editor() {
   const editorDataRef = useRef<ToolData>({
@@ -73,11 +75,15 @@ export default function Editor() {
   }
 
   const initialize = () => {
+    const size = parseInt(getCookie(G_SIZE), 10)
+    const rows = parseInt(getCookie(G_ROWS), 10)
+    const columns = parseInt(getCookie(G_COLUMNS), 10)
+
     editorDataRef.current.gridData = new Grid(
       gridRef,
       mainRef,
       {
-        size: 22, gap: 6, column: 100, row: 100,
+        size, gap: 6, columns, rows,
       },
     )
     editorDataRef.current.uiData = new Ui(
@@ -85,6 +91,10 @@ export default function Editor() {
       mainRef,
       editorDataRef.current.gridData,
     )
+
+    deleteCookie(G_SIZE)
+    deleteCookie(G_ROWS)
+    deleteCookie(G_COLUMNS)
   }
 
   const initializeControl = () => {
