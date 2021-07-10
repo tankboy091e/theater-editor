@@ -14,19 +14,22 @@ import { RiEraserLine, RiCursorLine } from 'react-icons/ri'
 import { BiSelection } from 'react-icons/bi'
 import { ImSortNumericAsc } from 'react-icons/im'
 import { FiTag } from 'react-icons/fi'
+import { AiOutlineInsertRowLeft } from 'react-icons/ai'
 import Grid from 'lib/entity/grid'
 import Ui from 'lib/entity/ui'
 import Inspector from 'components/inspector'
 import { ToolData, ToolType } from 'lib/entity/tool'
-import KeyboardEventListener from 'services/keyboard'
 import TaggerTool from 'services/tool/tagger'
-import { deleteCookie, getCookie } from 'lib/util/cookie'
+import { getCookie } from 'lib/util/cookie'
+import { usePrompt } from 'providers/dialog/prompt/inner'
+import { useKeyboard } from 'providers/keyboard'
 import { G_COLUMNS, G_ROWS, G_SIZE } from './landing'
 
 export default function Editor() {
   const editorDataRef = useRef<ToolData>({
     gridData: null,
     uiData: null,
+    keyboard: null,
   })
 
   const [tool, setTool] = useState<Tool>(null)
@@ -37,6 +40,10 @@ export default function Editor() {
   const mainRef = useRef<HTMLElement>()
   const gridRef = useRef<HTMLCanvasElement>()
   const uiRef = useRef<HTMLCanvasElement>()
+
+  const { createPrompt } = usePrompt()
+
+  const { on } = useKeyboard()
 
   const changeTool = (name: ToolType) => {
     const editorData = editorDataRef.current
@@ -90,21 +97,24 @@ export default function Editor() {
       uiRef,
       mainRef,
       editorDataRef.current.gridData,
+      createPrompt,
     )
+    editorDataRef.current.keyboard = {
+      on,
+    }
 
-    deleteCookie(G_SIZE)
-    deleteCookie(G_ROWS)
-    deleteCookie(G_COLUMNS)
+    // deleteCookie(G_SIZE)
+    // deleteCookie(G_ROWS)
+    // deleteCookie(G_COLUMNS)
   }
 
   const initializeControl = () => {
     uiRef.current.addEventListener('mousedown', onDragStart)
-    KeyboardEventListener.instance
-      .on('v', () => changeTool('select'))
-      .on('a', () => changeTool('assign'))
-      .on('e', () => changeTool('erase'))
-      .on('i', () => changeTool('indexer'))
-      .on('t', () => changeTool('tagger'))
+    on('v', () => changeTool('select'))
+    on('a', () => changeTool('assign'))
+    on('e', () => changeTool('erase'))
+    on('i', () => changeTool('indexer'))
+    on('t', () => changeTool('tagger'))
   }
 
   useResize(setCenter)
@@ -164,6 +174,10 @@ const tools: {
   {
     name: 'indexer',
     icon: <ImSortNumericAsc size={20} />,
+  },
+  {
+    name: 'row-tagger',
+    icon: <AiOutlineInsertRowLeft size={26} />,
   },
   {
     name: 'tagger',

@@ -3,6 +3,7 @@ import Head from 'next/head'
 import ModalProvider from 'providers/modal'
 import IntegratedDialogProvider from 'providers/dialog/integrated'
 import 'sass/global.scss'
+import KeyboardProvider from 'providers/keyboard'
 
 const DEFAULT_TITLE = 'title'
 const DEFAULT_DESCRIPTION = 'description'
@@ -29,7 +30,9 @@ export default function App({ Component, pageProps, router }: AppProps) {
       </Head>
       <ModalProvider>
         <IntegratedDialogProvider>
-          <Component {...pageProps} />
+          <KeyboardProvider>
+            <Component {...pageProps} />
+          </KeyboardProvider>
         </IntegratedDialogProvider>
       </ModalProvider>
     </>

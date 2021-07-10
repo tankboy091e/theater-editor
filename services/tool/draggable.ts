@@ -1,6 +1,5 @@
 import { IDraggable } from 'lib/entity'
 import { ToolData, ToolType } from 'lib/entity/tool'
-import KeyboardEventListener from 'services/keyboard'
 import Tool from '.'
 
 export default abstract class DraggableTool extends Tool implements IDraggable {
@@ -9,7 +8,7 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
 
   constructor(name: ToolType, data: ToolData) {
     super(name, data)
-    KeyboardEventListener.instance
+    this.keyboard
       .on('Escape', this.onDragCancle)
   }
 

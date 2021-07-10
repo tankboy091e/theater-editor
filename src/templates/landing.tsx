@@ -65,9 +65,9 @@ export default function Landing() {
       return
     }
 
-    setCookie(G_SIZE, size, 1000 * 60)
-    setCookie(G_ROWS, rows, 1000 * 60)
-    setCookie(G_COLUMNS, columns, 1000 * 60)
+    setCookie(G_SIZE, size, 1000 * 60 * 60)
+    setCookie(G_ROWS, rows, 1000 * 60 * 60)
+    setCookie(G_COLUMNS, columns, 1000 * 60 * 60)
 
     router.push('/editor')
   }

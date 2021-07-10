@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { Vector2 } from 'lib/util/mathf'
 import getPosition from 'lib/util/mouseEvent'
+import { CreatePrompt } from 'providers/dialog/prompt/inner'
 import { MutableRefObject } from 'react'
 import Canvas from './canvas'
 import Grid from './grid'
@@ -9,6 +10,8 @@ export default class Ui extends Canvas {
   private static readonly DEFAULT_STROKE_STYLE = 'rgba(0, 0, 0, 1)'
   private static readonly DEFAULT_FILL_STYLE = 'rgba(0, 0, 0, 0)'
 
+  public createPrompt: CreatePrompt
+
   private _origin: Vector2
   private _position: Vector2
 
@@ -16,10 +19,12 @@ export default class Ui extends Canvas {
     ref: MutableRefObject<HTMLCanvasElement>,
     containerRef: MutableRefObject<HTMLElement>,
     gridData: Grid,
+    createPrompt: CreatePrompt,
   ) {
     super(ref, containerRef)
     this.ref.current.width = gridData.width
     this.ref.current.height = gridData.height
+    this.createPrompt = createPrompt
   }
 
   public get origin() : Vector2 {

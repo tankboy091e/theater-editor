@@ -41,15 +41,17 @@ export default class TaggerTool extends DraggableTool {
     this.gridData.update()
   }
 
-  public onDragEnd(): void {
+  public async onDragEnd(): Promise<void> {
     super.onDragEnd()
 
     if (this.gridData.temporarySelectedCells.length === 0) {
       return
     }
 
-    const tag = this._options[TaggerTool.TAG_NAME].value
+    // const tag = this._options[TaggerTool.TAG_NAME].value
 
+    const tag = await this.uiData.createPrompt({ text: 'd?' })
+    console.log(tag)
     this.gridData.temporarySelectedCells
       .forEach((element) => {
         if (!(element.previous instanceof AssignedCell)) {

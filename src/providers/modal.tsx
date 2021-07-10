@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 type Listener = (this: HTMLDivElement, ev: MouseEvent) => any
 
 interface ModalProviderContextProps {
+    active: boolean
     appendToContainer : (component: React.ReactNode) => React.ReactPortal
     attachScrimOnClick : (func : Listener) => void
     detachScrimOnClick : (func : Listener) => void
@@ -104,6 +105,7 @@ export default function ModalProvider({
   }, [router])
 
   const value = {
+    active,
     appendToContainer,
     attachScrimOnClick,
     detachScrimOnClick,

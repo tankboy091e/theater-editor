@@ -16,6 +16,8 @@ export const usePrompt = () => useContext(PromptContext)
 
 type InputType = 'text' | 'password'
 
+export type CreatePrompt = (props: PromptMessageProps) => Promise<string>
+
 export default function Inner({ children }: { children?: React.ReactNode }) {
   const { buildDialog } = useDialog()
 
@@ -29,10 +31,10 @@ export default function Inner({ children }: { children?: React.ReactNode }) {
     inputRef.current = e.target.value
   }
 
-  const createPrompt = async ({
+  const createPrompt : CreatePrompt = async ({
     type = 'text',
     ...header
-  }: PromptMessageProps): Promise<string> => {
+  }) => {
     const res = await buildDialog({
       className: styles.container,
     })
