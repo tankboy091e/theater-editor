@@ -3,55 +3,51 @@ import Cell, { DefaultProps, Direction } from '..'
 interface AssigendProps extends DefaultProps {
   index?: number
   tags?: string[]
+  color? : string
 }
 
 export default class AssignedCell extends Cell {
-  private static readonly COLOR = 'rgba(0, 0, 0, 1)'
-  private static readonly INDEXED_COLOR = 'rgba(0, 100, 250, 1)'
   public readonly tags : string[]
-  private _index: number
-  private _column: string
+  public readonly color: string
+  public readonly column: string
+  public readonly section: string
+  public readonly index: number
 
-  constructor({ index, tags, ...props } : AssigendProps) {
+  constructor({
+    index, tags, color = 'rgba(0, 0, 0, 1)', ...props
+  } : AssigendProps) {
     super(props)
-    this._index = index
-    this.tags = []
+    this.index = index
+    this.tags = tags || []
+    this.color = color
 
     if (tags?.length > 0) {
-      tags = tags.filter((tag) => tag)
-      for (let i = tags.length - 1; i >= 0; i--) {
-        if (tags[i].includes('열')) {
-          const columnTag = tags[i]
-          const exceptColumnTags = tags.filter((tag) => !tag.includes('열'))
-          if (columnTag) {
-            this._column = columnTag.replace('열', '').trim()
-          }
-          this.tags = [...exceptColumnTags, columnTag]
-          return
-        }
-      }
-      this.tags = tags
+      this.tags = this.remainOnlyOneTag(this.tags, '열')
+      this.tags = this.remainOnlyOneTag(this.tags, '구역')
+      this.column = this.tags.find((tag) => tag.includes('열'))
+      this.section = this.tags.find((tag) => tag.includes('구역'))
     }
+  }
+
+  private remainOnlyOneTag(tags: string[], value: string) {
+    const array = tags.filter((tag) => tag)
+    for (let i = array.length - 1; i >= 0; i--) {
+      if (array[i].includes(value)) {
+        const specific = array[i]
+        const extra = array.filter((tag) => !tag.includes(value))
+        return [...extra, specific]
+      }
+    }
+    return array
   }
 
   protected get strokeStyle() {
-    if (!this._index) {
-      return AssignedCell.COLOR
-    }
-    return AssignedCell.INDEXED_COLOR
-  }
-
-  public get index() {
-    return this._index
-  }
-
-  public get column() {
-    return this._column
+    return this.color
   }
 
   public draw(context: CanvasRenderingContext2D, size: number) {
     super.draw(context, size)
-    if (this._index === undefined) {
+    if (this.index === undefined) {
       return
     }
     context.font = `${size * 0.5}px Lato`
@@ -59,7 +55,7 @@ export default class AssignedCell extends Cell {
     context.textBaseline = 'middle'
     context.fillStyle = 'rgba(0, 0, 0, 1)'
     context.fillText(
-      this._index.toString(),
+      this.index.toString(),
       this.position.x + size * 0.5,
       this.position.y + size * 0.5 + 1,
     )
@@ -67,21 +63,21 @@ export default class AssignedCell extends Cell {
 
   public indicateColumn(context: CanvasRenderingContext2D, size: number, direction: Direction) {
     context.font = `${size * 0.5}px Lato`
-    context.textAlign = 'center'
+    context.textAlign = 'right'
     context.textBaseline = 'middle'
     context.fillStyle = 'rgba(0, 0, 0, 1)'
 
     if (direction === 'horizontal') {
       context.fillText(
-        this._column,
-        this.position.x - size * 0.5,
+        this.column,
+        this.position.x - size * 0.5 + 1,
         this.position.y + size * 0.5 + 1,
       )
     }
 
     if (direction === 'vertical') {
       context.fillText(
-        this._column,
+        this.column,
         this.position.x + size * 0.5,
         this.position.y - size * 0.5,
       )

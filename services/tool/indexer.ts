@@ -79,17 +79,18 @@ export default class IndexerTool extends DraggableTool {
         if (!(element.previous instanceof AssignedCell)) {
           return
         }
-        const { tags, position } = element.previous
+        const { tags, position, color } = element.previous
         const { x, y } = position
 
         const newOne : {
           x: number
           y: number
           index?: number
+          color: string
           direction?: Direction
           tags?: string[]
         } = {
-          x, y, tags,
+          x, y, tags, color: color === 'rgba(0, 0, 0, 1)' ? 'rgba(0, 80, 255, 1)' : color,
         }
 
         newOne.direction = this.getDirection()

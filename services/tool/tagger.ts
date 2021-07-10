@@ -1,11 +1,13 @@
 import AssignedCell from 'lib/entity/cell/assigned'
 import TagSelectedCell from 'lib/entity/cell/selected/tag'
 import { ToolData } from 'lib/entity/tool'
-import TextOption from 'lib/entity/tool/options/text'
+import BooleanOption from 'lib/entity/tool/options/boolean'
+import ColorOption from 'lib/entity/tool/options/color'
 import DraggableTool from './draggable'
 
 export default class TaggerTool extends DraggableTool {
-  protected static readonly TAG_NAME = '태그 이름'
+  private static SHOULD_PAINT = '색칠하기'
+  private static PAINT_COLOR = '색 선택'
 
   constructor(data: ToolData) {
     super('tagger', data)
@@ -14,7 +16,8 @@ export default class TaggerTool extends DraggableTool {
     this.stokeStyle = 'rgba(245, 234, 60, .7)'
     this.fillStyle = 'rgba(245, 234, 60, .3)'
 
-    this._options[TaggerTool.TAG_NAME] = new TextOption('')
+    this._options[TaggerTool.SHOULD_PAINT] = new BooleanOption(false)
+    this._options[TaggerTool.PAINT_COLOR] = new ColorOption('#FFFFFF')
   }
 
   public onDrag(e: MouseEvent): void {
@@ -48,18 +51,27 @@ export default class TaggerTool extends DraggableTool {
       return
     }
 
-    // const tag = this._options[TaggerTool.TAG_NAME].value
+    const tag = await this.uiData.createPrompt({ text: '태그를 입력하세요' })
 
-    const tag = await this.uiData.createPrompt({ text: 'd?' })
-    console.log(tag)
+    if (!tag) {
+      this.onDragCancle()
+      return
+    }
+
+    const customColor = this._options[TaggerTool.SHOULD_PAINT].value === true
+      ? this._options[TaggerTool.PAINT_COLOR].value
+      : null
+
     this.gridData.temporarySelectedCells
       .forEach((element) => {
         if (!(element.previous instanceof AssignedCell)) {
           return
         }
-        const { tags, props, index } = element.previous
+        const {
+          tags, props, index, color,
+        } = element.previous
         element.current = new AssignedCell({
-          ...props, index, tags: [...tags, tag],
+          ...props, index, tags: [...tags, tag], color: customColor || color,
         })
       })
 

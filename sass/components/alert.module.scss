@@ -7,6 +7,11 @@
     border-radius: 7px;
 }
 
+.form {
+    display: flex;
+    flex-direction: column;
+}
+
 .title {
     color: colors.$accent;
 }
@@ -17,5 +22,13 @@
 }
 
 .menu {
+    display: flex;
+    justify-content: flex-end;
     margin-top: 12px;
+}
+
+.button { 
+    & + & {
+        margin-left: 8px;
+    }
 }

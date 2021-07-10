@@ -14,7 +14,6 @@ import { RiEraserLine, RiCursorLine } from 'react-icons/ri'
 import { BiSelection } from 'react-icons/bi'
 import { ImSortNumericAsc } from 'react-icons/im'
 import { FiTag } from 'react-icons/fi'
-import { AiOutlineInsertRowLeft } from 'react-icons/ai'
 import Grid from 'lib/entity/grid'
 import Ui from 'lib/entity/ui'
 import Inspector from 'components/inspector'
@@ -174,10 +173,6 @@ const tools: {
   {
     name: 'indexer',
     icon: <ImSortNumericAsc size={20} />,
-  },
-  {
-    name: 'row-tagger',
-    icon: <AiOutlineInsertRowLeft size={26} />,
   },
   {
     name: 'tagger',

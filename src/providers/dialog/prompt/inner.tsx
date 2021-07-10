@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useRef } from 'react'
 import Alert, { AlertHeaderProps } from 'components/alert'
-import styles from 'sass/components/alert.module.scss'
+import containerStyles from 'sass/components/alert.module.scss'
+import styles from 'sass/components/prompt.module.scss'
 import { useDialog } from '..'
 
 interface PromptMessageProps extends AlertHeaderProps {
@@ -36,7 +37,7 @@ export default function Inner({ children }: { children?: React.ReactNode }) {
     ...header
   }) => {
     const res = await buildDialog({
-      className: styles.container,
+      className: containerStyles.container,
     })
       .insert(({ ok, cancle }) => (
         <Alert
@@ -45,6 +46,7 @@ export default function Inner({ children }: { children?: React.ReactNode }) {
           cancle={cancle}
         >
           <input
+            className={styles.input}
             type={type}
             autoComplete="off"
             // eslint-disable-next-line jsx-a11y/no-autofocus
