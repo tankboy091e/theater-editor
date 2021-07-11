@@ -1,0 +1,77 @@
+@use '../lib/colors.scss' as colors;
+
+.container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.background {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    animation: scroll 60s linear infinite;
+}
+
+@keyframes scroll {
+    from {
+        transform: translate(0%, 0%)
+    }
+    to {
+        transform: translate(50%, 50%);
+    }
+}
+
+.foreground {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 10%;
+}
+
+.title {
+    font-size: 5rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 52px;
+    max-width: 250px;
+    width: 100%;
+    padding: 16px;
+    border: 1px solid rgba(black, .3);
+    background-color: colors.$background;
+}
+
+.input {
+    width: 100%;
+    font-size: 1rem;
+    padding: 12px;
+    text-align: center;
+
+    background-color: rgba(black, .05);
+
+    & + & {
+        margin-top: 12px;
+    }
+}
+
+.submit {
+    margin-top: 12px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    border-radius: 12px;
+    background-color: colors.$accent;
+}
+

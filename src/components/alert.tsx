@@ -14,28 +14,26 @@ export default function Alert({
 }: {
   children?: React.ReactNode
   header: AlertHeaderProps
-  ok?: MouseEventHandler
+  ok?: () => void
   cancle?: MouseEventHandler
 }) {
   const { title, text } = header
   return (
-    <>
+    <form className={styles.form} onSubmit={() => ok()}>
       <h4 className={styles.title}>{title || '안내'}</h4>
       {text && <p className={styles.text}>{text}</p>}
       {children}
-      <section className={styles.menu}>
+      <div className={styles.menu}>
         {ok && (
-        <button type="button" onClick={ok}>
-          확인
-        </button>
+        <input className={styles.button} type="submit" value="확인" />
         )}
         {cancle && (
-        <button type="button" onClick={cancle}>
+        <button className={styles.button} type="button" onClick={cancle}>
           취소
         </button>
         )}
-      </section>
-    </>
+      </div>
+    </form>
   )
 }
 

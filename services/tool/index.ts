@@ -2,7 +2,7 @@ import Grid from 'lib/entity/grid'
 import { Metadata, ToolData, ToolType } from 'lib/entity/tool'
 import { Options } from 'lib/entity/tool/options'
 import Ui from 'lib/entity/ui'
-import KeyboardEventListener from 'services/keyboard'
+import { OnKeyboard } from 'providers/keyboard'
 
 export default abstract class Tool {
   public readonly name: ToolType
@@ -11,11 +11,15 @@ export default abstract class Tool {
 
   protected gridData: Grid
   protected uiData: Ui
+  protected keyboard: {
+    on: OnKeyboard
+  }
 
   constructor(name: ToolType, data: ToolData) {
     this.name = name
     this.gridData = data.gridData
     this.uiData = data.uiData
+    this.keyboard = data.keyboard
     this.metadata = {
       name: '',
       description: '',
@@ -40,12 +44,11 @@ export default abstract class Tool {
     this.gridData.undo()
   }
 
-  private bindEventListeners() {
+  protected bindEventListeners() {
     this.undo = this.undo.bind(this)
   }
 
   private attachEventListeners() {
-    KeyboardEventListener.instance
-      .on(['Control', 'z'], this.undo)
+    this.keyboard.on(['Control', 'z'], this.undo)
   }
 }

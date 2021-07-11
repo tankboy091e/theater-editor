@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useRef } from 'react'
 import Alert, { AlertHeaderProps } from 'components/alert'
-import styles from 'sass/components/alert.module.scss'
+import containerStyles from 'sass/components/alert.module.scss'
+import styles from 'sass/components/prompt.module.scss'
 import { useDialog } from '..'
 
 interface PromptMessageProps extends AlertHeaderProps {
@@ -16,6 +17,8 @@ export const usePrompt = () => useContext(PromptContext)
 
 type InputType = 'text' | 'password'
 
+export type CreatePrompt = (props: PromptMessageProps) => Promise<string>
+
 export default function Inner({ children }: { children?: React.ReactNode }) {
   const { buildDialog } = useDialog()
 
@@ -29,12 +32,12 @@ export default function Inner({ children }: { children?: React.ReactNode }) {
     inputRef.current = e.target.value
   }
 
-  const createPrompt = async ({
+  const createPrompt : CreatePrompt = async ({
     type = 'text',
     ...header
-  }: PromptMessageProps): Promise<string> => {
+  }) => {
     const res = await buildDialog({
-      className: styles.container,
+      className: containerStyles.container,
     })
       .insert(({ ok, cancle }) => (
         <Alert
@@ -43,6 +46,7 @@ export default function Inner({ children }: { children?: React.ReactNode }) {
           cancle={cancle}
         >
           <input
+            className={styles.input}
             type={type}
             autoComplete="off"
             // eslint-disable-next-line jsx-a11y/no-autofocus

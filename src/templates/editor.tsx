@@ -18,13 +18,18 @@ import Grid from 'lib/entity/grid'
 import Ui from 'lib/entity/ui'
 import Inspector from 'components/inspector'
 import { ToolData, ToolType } from 'lib/entity/tool'
-import KeyboardEventListener from 'services/keyboard'
 import TaggerTool from 'services/tool/tagger'
+import { getCookie } from 'lib/util/cookie'
+import { usePrompt } from 'providers/dialog/prompt/inner'
+import { useKeyboard } from 'providers/keyboard'
+import MenuBar from 'components/menu-bar'
+import { G_COLUMNS, G_ROWS, G_SIZE } from './landing'
 
 export default function Editor() {
   const editorDataRef = useRef<ToolData>({
     gridData: null,
     uiData: null,
+    keyboard: null,
   })
 
   const [tool, setTool] = useState<Tool>(null)
@@ -35,6 +40,10 @@ export default function Editor() {
   const mainRef = useRef<HTMLElement>()
   const gridRef = useRef<HTMLCanvasElement>()
   const uiRef = useRef<HTMLCanvasElement>()
+
+  const { createPrompt } = usePrompt()
+
+  const { on } = useKeyboard()
 
   const changeTool = (name: ToolType) => {
     const editorData = editorDataRef.current
@@ -73,28 +82,39 @@ export default function Editor() {
   }
 
   const initialize = () => {
+    const size = parseInt(getCookie(G_SIZE), 10)
+    const rows = parseInt(getCookie(G_ROWS), 10)
+    const columns = parseInt(getCookie(G_COLUMNS), 10)
+
     editorDataRef.current.gridData = new Grid(
       gridRef,
       mainRef,
       {
-        size: 22, gap: 6, column: 100, row: 100,
+        size, gap: 6, columns, rows,
       },
     )
     editorDataRef.current.uiData = new Ui(
       uiRef,
       mainRef,
       editorDataRef.current.gridData,
+      createPrompt,
     )
+    editorDataRef.current.keyboard = {
+      on,
+    }
+
+    // deleteCookie(G_SIZE)
+    // deleteCookie(G_ROWS)
+    // deleteCookie(G_COLUMNS)
   }
 
   const initializeControl = () => {
     uiRef.current.addEventListener('mousedown', onDragStart)
-    KeyboardEventListener.instance
-      .on('v', () => changeTool('select'))
-      .on('a', () => changeTool('assign'))
-      .on('e', () => changeTool('erase'))
-      .on('i', () => changeTool('indexer'))
-      .on('t', () => changeTool('tagger'))
+    on('v', () => changeTool('select'))
+    on('a', () => changeTool('assign'))
+    on('e', () => changeTool('erase'))
+    on('i', () => changeTool('indexer'))
+    on('t', () => changeTool('tagger'))
   }
 
   useResize(setCenter)
@@ -112,6 +132,7 @@ export default function Editor() {
 
   return (
     <section ref={containerRef} className={styles.container}>
+      <MenuBar toolData={editorDataRef.current} />
       <section ref={toolBarRef} className={styles.toolBar}>
         {tools.map(({ name, icon }) => (
           <button

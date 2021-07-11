@@ -4,11 +4,11 @@ import styles from 'sass/layouts/default.module.scss'
 export default function Layout({
   children,
   header,
-  bottom: footer,
+  footer,
 }: {
   children: React.ReactNode
   header?: React.ReactNode
-  bottom?: React.ReactNode
+  footer?: React.ReactNode
 }) {
   return (
     <>
@@ -16,7 +16,7 @@ export default function Layout({
         {header && <header className={styles.header}>{header}</header>}
         <main className={styles.main}>{children}</main>
       </div>
-      {footer && <footer className={styles.footer}>{footer}</footer>}
+      {footer && footer}
     </>
   )
 }

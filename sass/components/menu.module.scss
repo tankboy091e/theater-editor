@@ -1,0 +1,13 @@
+.container {
+    border: 1px solid rgba(black, .3);
+    font-size: .9rem;
+    padding: 4px;
+}
+
+.menu {
+    padding: 4px 4px;
+
+    &:hover {
+        background-color: rgba(black, .05);
+    }
+}

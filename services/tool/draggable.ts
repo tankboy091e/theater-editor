@@ -1,6 +1,5 @@
 import { IDraggable } from 'lib/entity'
 import { ToolData, ToolType } from 'lib/entity/tool'
-import KeyboardEventListener from 'services/keyboard'
 import Tool from '.'
 
 export default abstract class DraggableTool extends Tool implements IDraggable {
@@ -9,8 +8,7 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
 
   constructor(name: ToolType, data: ToolData) {
     super(name, data)
-    this.bindDragListeners()
-    KeyboardEventListener.instance
+    this.keyboard
       .on('Escape', this.onDragCancle)
   }
 
@@ -121,7 +119,8 @@ export default abstract class DraggableTool extends Tool implements IDraggable {
     this.uiData.ref.current.removeEventListener('mousemove', this.onDrag)
   }
 
-  private bindDragListeners() {
+  protected bindEventListeners() {
+    super.bindEventListeners()
     this.onDrag = this.onDrag.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
     this.onDragEnd = this.onDragEnd.bind(this)

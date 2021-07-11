@@ -7,16 +7,28 @@
     border-radius: 7px;
 }
 
+.form {
+    display: flex;
+    flex-direction: column;
+}
+
 .title {
     color: colors.$accent;
-    font-size: 14px;
 }
 
 .text {
     margin-top: 12px;
-    font-size: 12px;
+    line-height: 1.5;
 }
 
 .menu {
+    display: flex;
+    justify-content: flex-end;
     margin-top: 12px;
+}
+
+.button { 
+    & + & {
+        margin-left: 8px;
+    }
 }
