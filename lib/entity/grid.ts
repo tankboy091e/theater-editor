@@ -136,7 +136,7 @@ export default class Grid extends Canvas {
       const { size } = this
       this.context.textAlign = 'center'
       this.context.textBaseline = 'middle'
-      this.context.font = `${size}px Lato`
+      this.context.font = `bold ${size}px Lato`
       this.context.fillStyle = 'rgba(0, 0, 0, 1)'
       this.context.fillText(key, 0.5 * ((max.x + min.x) + size), 0.5 * ((max.y + min.y) + size))
     })

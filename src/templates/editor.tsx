@@ -22,6 +22,7 @@ import TaggerTool from 'services/tool/tagger'
 import { getCookie } from 'lib/util/cookie'
 import { usePrompt } from 'providers/dialog/prompt/inner'
 import { useKeyboard } from 'providers/keyboard'
+import MenuBar from 'components/menu-bar'
 import { G_COLUMNS, G_ROWS, G_SIZE } from './landing'
 
 export default function Editor() {
@@ -131,6 +132,7 @@ export default function Editor() {
 
   return (
     <section ref={containerRef} className={styles.container}>
+      <MenuBar toolData={editorDataRef.current} />
       <section ref={toolBarRef} className={styles.toolBar}>
         {tools.map(({ name, icon }) => (
           <button

@@ -1,9 +1,19 @@
+import { Vector2 } from 'lib/util/mathf'
 import Cell, { DefaultProps, Direction } from '..'
 
 interface AssigendProps extends DefaultProps {
   index?: number
   tags?: string[]
   color? : string
+}
+
+export interface AssignedCellData {
+  position: Vector2
+  tags : string[]
+  color: string
+  column: string
+  section: string
+  index: number
 }
 
 export default class AssignedCell extends Cell {
@@ -81,6 +91,17 @@ export default class AssignedCell extends Cell {
         this.position.x + size * 0.5,
         this.position.y - size * 0.5,
       )
+    }
+  }
+
+  public data() {
+    return {
+      position: this.position,
+      index: this.index,
+      color: this.color,
+      tags: this.tags,
+      column: this.column,
+      section: this.section,
     }
   }
 }
