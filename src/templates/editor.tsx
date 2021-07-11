@@ -19,7 +19,7 @@ import Ui from 'lib/entity/ui'
 import Inspector from 'components/inspector'
 import { ToolData, ToolType } from 'lib/entity/tool'
 import TaggerTool from 'services/tool/tagger'
-import { getCookie } from 'lib/util/cookie'
+import { deleteCookie, getCookie } from 'lib/util/cookie'
 import { usePrompt } from 'providers/dialog/prompt/inner'
 import { useKeyboard } from 'providers/keyboard'
 import MenuBar from 'components/menu-bar'
@@ -103,9 +103,9 @@ export default function Editor() {
       on,
     }
 
-    // deleteCookie(G_SIZE)
-    // deleteCookie(G_ROWS)
-    // deleteCookie(G_COLUMNS)
+    deleteCookie(G_SIZE)
+    deleteCookie(G_ROWS)
+    deleteCookie(G_COLUMNS)
   }
 
   const initializeControl = () => {
