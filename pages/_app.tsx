@@ -5,7 +5,7 @@ import IntegratedDialogProvider from 'providers/dialog/integrated'
 import 'sass/global.scss'
 import KeyboardProvider from 'providers/keyboard'
 
-const DEFAULT_TITLE = 'title'
+const DEFAULT_TITLE = 'Theater Editor'
 const DEFAULT_DESCRIPTION = 'description'
 
 export default function App({ Component, pageProps, router }: AppProps) {
