@@ -91,11 +91,13 @@ export default function MenuBar({ toolData }: { toolData: ToolData }) {
         }
       })
 
+    const { size, gap } = toolData.gridData
+
     result.forEach((rows) => rows.forEach((data) => {
       const { position } = data
       data.position = {
-        x: position.x - min.x,
-        y: position.y - min.y,
+        x: (position.x - min.x) / (size + gap),
+        y: (position.y - min.y) / (size + gap),
       }
     }))
 
